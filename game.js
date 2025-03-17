@@ -9,6 +9,9 @@ let socket;
 let playerId;
 let remotePlayers = {};
 
+// Make player count globally accessible for a-loco.js
+window.playerCount = 1;
+
 // Initialize WebSocket connection
 document.addEventListener('DOMContentLoaded', () => {
     // Connect to WebSocket server
@@ -108,11 +111,8 @@ function syncPlayerPosition() {
         }
     }));
     
-    // Update the HUD with coordinates.
-    const hudText = document.querySelector('#micro-hud-text');
-    if (hudText) {
-        hudText.setAttribute('value', `${Math.floor(position.x)} ${Math.floor(position.y)} ${Math.floor(position.z)} | Players: ${Object.keys(remotePlayers).length + 1}`);
-    }
+    // Update global player count (will be used by a-loco.js)
+    window.playerCount = Object.keys(remotePlayers).length + 1;
 }
 
 // Update other player entities based on server data
