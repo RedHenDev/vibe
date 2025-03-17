@@ -98,9 +98,11 @@ AFRAME.registerComponent('terrain-movement', {
             const roll=rotation.z;
 
         // Location of co-ords projected to a HUD.
+        /*
         document.querySelector('#micro-hud-text').setAttribute(
             'value',`${Math.floor(position.x)} ${Math.floor(position.y)} ${Math.floor(position.z)}`);
-        // document.querySelector('#micro-hud-text').setAttribute(
+        */
+            // document.querySelector('#micro-hud-text').setAttribute(
         //     'value',`${Math.floor(rotation.y)} `);
             
 
