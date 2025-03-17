@@ -30,14 +30,15 @@
 <body>
     <div id="connection-status">Connection status: Disconnected</div>
     
-    <a-scene pointer-lock-controls fog="type: linear; color: #00CBFF; far:365;">
+    <!-- color: #00CBFF -->
+    <a-scene pointer-lock-controls fog="type: linear; color: #000; far:365;">
         <!-- Player with terrain locomotion system -->
         <a-entity id="player" position="0 25 0" terrain-movement="height: 4.6">
             <a-camera id="cam" wasd-controls="enabled: false" look-controls="enabled: false">
                 <!-- micro HUD Interface -->
                 <a-entity id="micro-hud">
                     <!-- Background panel -->
-                    <a-plane position="0 -0.6 -3"
+                    <a-plane position="0 -1.0 -3"
                                 width="3.0" height="0.6"
                                 material="color: #EEE; opacity: 0.2; depthTest: false">
                                 <a-text  
@@ -67,12 +68,12 @@
             </a-camera>
             
             <!-- Sky -->
-            <a-sky color="#00CBFF"></a-sky>
+            <a-sky color="#16161d"></a-sky>
             
             <!-- Light source -->
             <a-entity
                 light="type: point;
-                    color: #FFFFFF;
+                    color: #FF0000;
                     intensity: 6.0;
                     distance: 0;
                     decay: 0;
