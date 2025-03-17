@@ -1,6 +1,6 @@
-// Game configuration
+// Game configuration.
 const config = {
-    websocketUrl: 'wss://weeble-server.glitch.me/', // Update with your actual server URL
+    websocketUrl: 'wss://weeble-server.glitch.me/',
     playerColors: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'cyan', 'magenta']
 };
 

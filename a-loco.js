@@ -102,8 +102,9 @@ AFRAME.registerComponent('terrain-movement', {
 // Add player count if available
 const playerCount = window.playerCount || 1;
 document.querySelector('#micro-hud-text').setAttribute(
-    'value',`${Math.floor(position.x)} ${Math.floor(position.y)} ${Math.floor(position.z)} | Players: ${playerCount}`);
-        /*
+    'value',`X ${Math.floor(position.x)} Z ${Math.floor(position.z)} | Souls: ${playerCount}`);
+    //${Math.floor(position.y)}    
+    /*
         document.querySelector('#micro-hud-text').setAttribute(
             'value',`${Math.floor(position.x)} ${Math.floor(position.y)} ${Math.floor(position.z)}`);
         */

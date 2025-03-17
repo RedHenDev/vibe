@@ -1,6 +1,6 @@
 // Procedural terrain generation.
 //let ws=prompt('Type a word or phrase to generate\n a new terrain.');
-let ws='jojo';
+let ws='1';
 const worldSeed = getSeed(ws);
 
 function getSeed(seedWord){
@@ -84,25 +84,6 @@ const noise = {
         );
     }
 };
-
-/*
-// Auxiliary function to get terrain height at any point.
-function getTerrainHeight(x, z) {
-    const xCoord = x * 0.05;
-    const zCoord = z * 0.05;
-    
-    let height = 0;
-    height += noise.noise(xCoord * 1, 0, zCoord * 1) * 10;
-    height += noise.noise(xCoord * 2, 0, zCoord * 2) * 5;
-    height += noise.noise(xCoord * 4, 0, zCoord * 4) * 2.5;
-    
-    // Rare mountains.
-    if (noise.noise(xCoord * 0.5, 0, zCoord * 0.5) > 0.5) {
-        height *= 5;
-    }
-    
-    return height;
-}*/
 
 function getTerrainHeight(x, z) {
     // Default 0.05.
@@ -221,9 +202,9 @@ AFRAME.registerComponent('terrain-generator', {
         this.generateChunk(-99,999);
         // Chunksize default 88.
         // 204.
-        this.chunkSize=128;
+        this.chunkSize=64;
         // Default number of chunks to gen in one go is 1, not 3.
-        this.chunksToGen=2;
+        this.chunksToGen=4;
 
         // Move player slightly to trigger generation of surrounding
         // terrain chunks.

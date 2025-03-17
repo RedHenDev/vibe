@@ -6,6 +6,8 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
+    <!-- Pointer lock controls for free look -->
+    <script src="pointer-lock.js"></script>
     <script src="game.js"></script>
     <style>
         body {
@@ -28,16 +30,16 @@
 <body>
     <div id="connection-status">Connection status: Disconnected</div>
     
-    <a-scene>
+    <a-scene pointer-lock-controls fog="type: linear; color: #00CBFF; far:365;">
         <!-- Player with terrain locomotion system -->
         <a-entity id="player" position="0 25 0" terrain-movement="height: 4.6">
-            <a-camera id="cam" wasd-controls="enabled: false" look-controls>
+            <a-camera id="cam" wasd-controls="enabled: false" look-controls="enabled: false">
                 <!-- micro HUD Interface -->
                 <a-entity id="micro-hud">
                     <!-- Background panel -->
                     <a-plane position="0 -0.6 -3"
-                                width="1.4" height="0.3"
-                                material="color: #0AA; opacity: 0.1; depthTest: false">
+                                width="3.0" height="0.6"
+                                material="color: #EEE; opacity: 0.2; depthTest: false">
                                 <a-text  
                                     id="micro-hud-text"
                                     value="Loading..."
@@ -70,8 +72,8 @@
             <!-- Light source -->
             <a-entity
                 light="type: point;
-                    color: #FFFF00;
-                    intensity: 8.0;
+                    color: #FFFFFF;
+                    intensity: 6.0;
                     distance: 0;
                     decay: 0;
                     castShadow: true"
