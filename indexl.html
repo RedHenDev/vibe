@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Multiplayer A-Frame Game</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="game.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #connection-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 5px;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div id="connection-status">Connection status: Disconnected</div>
+    
+    <a-scene>
+        <!-- Camera -->
+        <a-entity position="0 20 0" rotation="-90 0 0">
+            <a-camera></a-camera>
+        </a-entity>
+        
+        <!-- Sky -->
+        <a-sky color="#87CEEB"></a-sky>
+        
+        <!-- Bumpy Landscape -->
+        <a-entity id="landscape"></a-entity>
+        
+        <!-- Player Container -->
+        <a-entity id="players"></a-entity>
+        
+        <!-- Lighting -->
+        <a-light type="ambient" color="#BBB"></a-light>
+        <a-light type="directional" position="0 1 0" color="#FFF" intensity="0.6"></a-light>
+    </a-scene>
+</body>
+</html>
