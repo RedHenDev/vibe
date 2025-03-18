@@ -7,7 +7,7 @@
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
     <!-- Pointer lock controls for free look -->
-    <script src="pointer-lock.js"></script>
+    <script src="adaptive-controls.js"></script>
     <script src="game.js"></script>
     <style>
         body {
@@ -31,10 +31,10 @@
     <div id="connection-status">Connection status: Disconnected</div>
     
     <!-- color: #00CBFF -->
-    <a-scene pointer-lock-controls fog="type: linear; color: #000; far:365;">
+    <a-scene adaptive-controls fog="type: linear; color: #0BE; far:365;">
         <!-- Player with terrain locomotion system -->
         <a-entity id="player" position="0 25 0" terrain-movement="height: 4.6">
-            <a-camera id="cam" wasd-controls="enabled: false" look-controls="enabled: false">
+            <a-camera id="cam" wasd-controls="enabled: false">
                 <!-- micro HUD Interface -->
                 <a-entity id="micro-hud">
                     <!-- Background panel -->
@@ -68,12 +68,13 @@
             </a-camera>
             
             <!-- Sky -->
-            <a-sky color="#16161d"></a-sky>
+            <!-- Eigengrau <a-sky color="#16161d"></a-sky> -->
+            <a-sky color="#00EEFF"></a-sky>
             
             <!-- Light source -->
             <a-entity
                 light="type: point;
-                    color: #FF0000;
+                    color: #EEEEEE;
                     intensity: 6.0;
                     distance: 0;
                     decay: 0;
