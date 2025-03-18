@@ -29,9 +29,18 @@
 </head>
 <body>
     <div id="connection-status">Connection status: Disconnected</div>
-    
+
     <!-- color: #00CBFF -->
     <a-scene adaptive-controls fog="type: linear; color: #0BE; far:365;">
+        
+        <a-assets>
+        <!-- Preload our assets. -->
+            <a-asset-item id="mGlasst" src="./assets/glasst.glb"></a-asset-item>
+            
+            <!-- <img crossorigin="anonymous" id="iJoDraw" src="./assets/drawing_1.jpg"></img> -->
+    
+        </a-assets>
+
         <!-- Player with terrain locomotion system -->
         <a-entity id="player" position="0 25 0" terrain-movement="height: 4.6">
             <a-camera id="cam" wasd-controls="enabled: false">
@@ -88,6 +97,14 @@
         
         <!-- Terrain generation -->
         <a-entity terrain-generator></a-entity>
+
+        <!-- mobs! -->
+        <a-entity   gltf-model="#mGlasst"
+        id="glasst"
+        scale="4 4 4"     
+        position="0 16 -20"    
+        >
+        </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->
         <!-- <a-entity id="hud" position="0 999 0"></a-entity> -->
