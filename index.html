@@ -6,6 +6,10 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
+    <!-- Enhanced AI system -->
+    <script src="enhanced-ai-sys.js"></script>
+    <!-- NPC Manager -->
+    <script src="npc-manager.js"></script>
     <!-- Pointer lock controls for free look -->
     <script src="adaptive-controls.js"></script>
     <script src="game.js"></script>
@@ -25,10 +29,22 @@
             border-radius: 5px;
             z-index: 999;
         }
+        #npc-stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 5px;
+            z-index: 999;
+            display: none; /* Hidden by default, toggle with key press */
+        }
     </style>
 </head>
 <body>
     <div id="connection-status">Connection status: Disconnected</div>
+    <div id="npc-stats">NPC Stats: 0 active</div>
 
     <!-- color: #00CBFF -->
     <a-scene adaptive-controls fog="type: linear; color: #0BE; far:365;">
@@ -36,9 +52,6 @@
         <a-assets>
         <!-- Preload our assets. -->
             <a-asset-item id="mGlasst" src="./assets/glasst.glb"></a-asset-item>
-            
-            <!-- <img crossorigin="anonymous" id="iJoDraw" src="./assets/drawing_1.jpg"></img> -->
-    
         </a-assets>
 
         <!-- Player with terrain locomotion system -->
@@ -77,7 +90,6 @@
             </a-camera>
             
             <!-- Sky -->
-            <!-- Eigengrau <a-sky color="#16161d"></a-sky> -->
             <a-sky color="#00DDFF"></a-sky>
             
             <!-- Light source -->
@@ -98,21 +110,96 @@
         <!-- Terrain generation -->
         <a-entity terrain-generator></a-entity>
 
-        <!-- mobs! -->
-        <a-entity   gltf-model="#mGlasst"
-        id="glasst"
-        scale="4 4 4"     
-        position="0 16 -20"    
-        >
+        <!-- Your original glasst NPC - can leave for reference -->
+        <a-entity gltf-model="#mGlasst"
+            id="glasst"
+            scale="4 4 4"     
+            position="0 16 -20"
+            ai-locomotion="height:12;speed:0.7;targetID:#player;
+            rSpeed:0.9;clampY:false" 
+        ></a-entity>
+        
+        <!-- NPC container, managed by NPC Manager -->
+        <a-entity id="npcs"></a-entity>
+        
+        <!-- NPC Manager entity -->
+        <a-entity 
+            id="npc-manager-entity" 
+            npc-manager="
+                maxNPCs: 20;
+                spawnRadius: 100;
+                activationDistance: 150">
         </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->
         <!-- <a-entity id="hud" position="0 999 0"></a-entity> -->
         <!-- HUD interactions for settings. NB before a-loco. -->
         <script src="HUD_menu.js"></script>
+        
     </a-scene>
     
     <!-- Movement system -->
     <script src="a-loco.js"></script>
+    
+    <!-- Add keyboard listener for toggling NPC stats display -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            // Press 'N' to toggle NPC stats
+            if (e.key === 'n' || e.key === 'N') {
+                const statsEl = document.getElementById('npc-stats');
+                if (statsEl) {
+                    statsEl.style.display = statsEl.style.display === 'none' ? 'block' : 'none';
+                }
+            }
+            
+            // Press '+' to increase max NPCs
+            if (e.key === '+' || e.key === '=') {
+                const npcManager = document.querySelector('#npc-manager-entity').components['npc-manager'];
+                if (npcManager) {
+                    const system = document.querySelector('a-scene').systems['npc-manager'];
+                    if (system) {
+                        system.data.maxNPCs += 5;
+                        console.log(`Max NPCs increased to ${system.data.maxNPCs}`);
+                        updateNPCStats();
+                    }
+                }
+            }
+            
+            // Press '-' to decrease max NPCs
+            if (e.key === '-' || e.key === '_') {
+                const npcManager = document.querySelector('#npc-manager-entity').components['npc-manager'];
+                if (npcManager) {
+                    const system = document.querySelector('a-scene').systems['npc-manager'];
+                    if (system) {
+                        system.data.maxNPCs = Math.max(0, system.data.maxNPCs - 5);
+                        console.log(`Max NPCs decreased to ${system.data.maxNPCs}`);
+                        updateNPCStats();
+                    }
+                }
+            }
+        });
+        
+        // Update NPC stats display
+        function updateNPCStats() {
+            const statsEl = document.getElementById('npc-stats');
+            const system = document.querySelector('a-scene').systems['npc-manager'];
+            
+            if (statsEl && system) {
+                const active = system.npcs.filter(npc => npc.active).length;
+                const total = system.npcs.length;
+                const max = system.data.maxNPCs;
+                
+                statsEl.textContent = `NPCs: ${active} active / ${total} total / ${max} max`;
+            }
+            
+            // Update every second
+            setTimeout(updateNPCStats, 1000);
+        }
+        
+        // Start updating stats after the scene loads
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+            updateNPCStats();
+        });
+    </script>
 </body>
 </html>
