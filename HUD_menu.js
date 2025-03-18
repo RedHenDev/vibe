@@ -81,6 +81,7 @@ AFRAME.registerComponent('generate-hud', {
       tmc.lunaBounce = event.detail.state;
     });
 
+    /*
     let button4;
     if (worldSeed!=1){
     button4 = createButton('b4', '-1 -0.6 0', 'snow', (event) => {
@@ -105,15 +106,18 @@ AFRAME.registerComponent('generate-hud', {
     button5.setAttribute('buttonText', 'position', '0 0 0.01');
     button5.setAttribute('scale', "12 12 12");
     button5.setAttribute('look-at','targetID:#player;rSpeed:1');
+    */
 
     // Add buttons to panel.
     panel.appendChild(button1);
     panel.appendChild(button2);
     panel.appendChild(button3);
+    /*
     if (worldSeed!=1){
     panel.appendChild(button4);
     }
     sceneEl.appendChild(button5);
+    */
 
     // Add panel to HUD.
     hudEntity.appendChild(panel);
@@ -165,55 +169,3 @@ AFRAME.registerComponent('toggle-button', {
     this.el.setAttribute('material', 'color', this.state ? activeColor : inactiveColor);
   }
 });
-
-/*
-<!-- HUD Interface -->
-        <a-entity id="hud" follow-camera>
-            <!-- Background panel -->
-             <!-- 0 2.6 -2 and 15, not 5 and 90. -->
-            <a-plane position="0 4 -2" rotation="70 0 0"
-                    width="4" height="2" 
-                    material="color: #088; opacity: 0.8; depthTest: true">
-                
-                <!-- Button 1 -->
-                <a-box id="b1" position="-1 0 0" 
-                    scale="0.5 0.5 0.005"
-                    toggle-button="label: Speed Mode; initialState: false">
-                    <a-text value="speed \nmode" 
-                            position="0 0 1" 
-                            scale="1 1 1" 
-                            align="center"
-                            color="#fff"></a-text>
-                </a-box>
-                
-                <!-- Button 2 -->
-                <a-box id="b2" position="0 0 0" 
-                    scale="0.5 0.5 0.005"
-                    toggle-button="label: Speed Mode; initialState: false">
-                    <a-text value="fly \nmode" 
-                            position="0 0 1" 
-                            scale="1 1 1" 
-                            align="center"
-                            color="#fff"></a-text>
-                </a-box>
-                
-                <!-- Button 3 -->
-                <a-box id="b3" position="1 0 0" 
-                    scale="0.5 0.5 0.005"
-                    toggle-button="label: Speed Mode; initialState: false">
-                    <a-text value="luna \nbounce" 
-                            position="0 0 1" 
-                            scale="1 1 1" 
-                            align="center"
-                            color="#fff"></a-text>
-                </a-box>
-                
-                <!-- Title -->
-                <a-text id="hud-text" value="settings" 
-                        position="0 0.75 0.01" 
-                        scale="1 1 1" 
-                        align="center" 
-                        color="#0FF"></a-text>
-            </a-plane>
-        </a-entity>
-*/

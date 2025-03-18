@@ -69,7 +69,7 @@ AFRAME.registerComponent('adaptive-controls', {
       // Disable A-Frame's default look controls
       this.camera.setAttribute('look-controls', 'enabled: false');
       
-      // Initial click to request pointer lock
+      // Add click listener to entire canvas for pointer lock
       this.canvasEl.addEventListener('click', this.requestPointerLock.bind(this));
       
       // Set up pointer lock event listeners
@@ -84,12 +84,12 @@ AFRAME.registerComponent('adaptive-controls', {
       // Mouse move handler for camera rotation
       this.onMouseMove = this.onMouseMove.bind(this);
       
-      // Create desktop instructions
+      // Create desktop instructions that auto-hide
       this.createDesktopInstructions();
     },
   
     createDesktopInstructions: function () {
-      // Create instructions overlay for desktop
+      // Create a more subtle, auto-hiding instruction overlay for desktop
       this.instructionsEl = document.createElement('div');
       this.instructionsEl.style.position = 'absolute';
       this.instructionsEl.style.top = '50%';
@@ -102,15 +102,58 @@ AFRAME.registerComponent('adaptive-controls', {
       this.instructionsEl.style.padding = '10px';
       this.instructionsEl.style.zIndex = '999';
       this.instructionsEl.style.cursor = 'pointer';
-      this.instructionsEl.innerHTML = 'Click to look around freely (ESC to exit)<br>WASD/Arrow keys to move, Shift to toggle run';
+      this.instructionsEl.innerHTML = 'Click to look around freely<br>WASD/Arrow keys to move, Shift to toggle run';
       
+      // Add a close button
+      const closeButton = document.createElement('div');
+      closeButton.style.position = 'absolute';
+      closeButton.style.top = '5px';
+      closeButton.style.right = '10px';
+      closeButton.style.color = 'white';
+      closeButton.style.fontSize = '20px';
+      closeButton.style.cursor = 'pointer';
+      closeButton.textContent = '×';
+      closeButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent triggering pointer lock
+        this.hideInstructions();
+      });
+      
+      this.instructionsEl.appendChild(closeButton);
       document.body.appendChild(this.instructionsEl);
       
-      // Add click handler to instructions
+      // Add click handler to instructions for pointer lock
       this.instructionsEl.addEventListener('click', this.requestPointerLock.bind(this));
+      
+      // Auto-hide after 8 seconds
+      setTimeout(() => {
+        this.hideInstructions();
+      }, 8000);
+    },
+    
+    hideInstructions: function() {
+      if (this.instructionsEl && this.instructionsEl.parentNode) {
+        this.instructionsEl.style.opacity = '0';
+        this.instructionsEl.style.transition = 'opacity 1s ease-in-out';
+        setTimeout(() => {
+          if (this.instructionsEl && this.instructionsEl.parentNode) {
+            this.instructionsEl.parentNode.removeChild(this.instructionsEl);
+            this.instructionsEl = null;
+          }
+        }, 1000);
+      }
     },
   
-    requestPointerLock: function () {
+    requestPointerLock: function (event) {
+      // Don't request if we're clicking on A-Frame UI elements (like the fullscreen button)
+      if (event && event.target) {
+        const target = event.target;
+        // Check if we're clicking on the A-Frame UI or any child of it
+        if (target.closest('.a-enter-vr') || target.closest('.a-orientation-modal')) {
+          console.log("Clicked on A-Frame UI, ignoring pointer lock request");
+          return;
+        }
+      }
+      
       if (!this.pointerLocked) {
         // Request pointer lock on the canvas
         this.canvasEl.requestPointerLock = this.canvasEl.requestPointerLock ||
@@ -130,25 +173,29 @@ AFRAME.registerComponent('adaptive-controls', {
         
         // Pointer is locked, add mousemove listener
         this.pointerLocked = true;
-        this.instructionsEl.style.display = 'none';
-        document.addEventListener('mousemove', this.onMouseMove, false);
         
+        // Hide instructions if they're still visible
+        if (this.instructionsEl) {
+          this.hideInstructions();
+        }
+        
+        document.addEventListener('mousemove', this.onMouseMove, false);
         console.log('Pointer locked');
       } else {
         // Pointer is unlocked, remove mousemove listener
         this.pointerLocked = false;
-        this.instructionsEl.style.display = 'block';
         document.removeEventListener('mousemove', this.onMouseMove, false);
-        
         console.log('Pointer unlocked');
       }
     },
   
     onPointerLockError: function () {
       console.error('Error obtaining pointer lock');
-      this.instructionsEl.innerHTML = 
-        'Error enabling look controls. Click again to retry.<br>' +
-        'Make sure you\'re using a supported browser and are clicking on the game area.';
+      if (this.instructionsEl) {
+        this.instructionsEl.innerHTML = 
+          'Error enabling look controls. Click again to retry.<br>' +
+          'Make sure you\'re using a supported browser and are clicking on the game area.';
+      }
     },
   
     onMouseMove: function (event) {
