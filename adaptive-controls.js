@@ -45,9 +45,9 @@ AFRAME.registerComponent('adaptive-controls', {
       this.instructionsEl.style.padding = '10px';
       this.instructionsEl.style.borderRadius = '5px';
       this.instructionsEl.style.zIndex = '999';
-      this.instructionsEl.innerHTML = 'Drag to look around<br>Use on-screen buttons to move';
+      this.instructionsEl.innerHTML = 'Drag to look around';
       
-      // Auto-hide after 10 seconds
+      // Auto-hide after 5 seconds
       setTimeout(() => {
         if (this.instructionsEl && this.instructionsEl.parentNode) {
           this.instructionsEl.style.opacity = '0';
@@ -58,93 +58,9 @@ AFRAME.registerComponent('adaptive-controls', {
             }
           }, 1000);
         }
-      }, 10000);
+      }, 5000);
       
       document.body.appendChild(this.instructionsEl);
-      
-      // Add mobile movement buttons if not present
-      this.addMobileMovementButtons();
-    },
-  
-    addMobileMovementButtons: function () {
-      const controlsContainer = document.createElement('div');
-      controlsContainer.id = 'mobile-controls';
-      controlsContainer.style.position = 'absolute';
-      controlsContainer.style.bottom = '20px';
-      controlsContainer.style.left = '20px';
-      controlsContainer.style.zIndex = '1000';
-      controlsContainer.style.display = 'grid';
-      controlsContainer.style.gridTemplateColumns = 'repeat(3, 60px)';
-      controlsContainer.style.gridTemplateRows = 'repeat(3, 60px)';
-      controlsContainer.style.gap = '5px';
-      
-      const buttonStyle = `
-        width: 60px;
-        height: 60px;
-        background-color: rgba(50, 50, 50, 0.6);
-        color: white;
-        font-size: 24px;
-        border: none;
-        border-radius: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        user-select: none;
-        -webkit-user-select: none;
-      `;
-      
-      // Create movement buttons
-      const buttons = [
-        { grid: '1 / 2', text: '↑', key: 'ArrowUp' },
-        { grid: '2 / 1', text: '←', key: 'ArrowLeft' },
-        { grid: '2 / 3', text: '→', key: 'ArrowRight' },
-        { grid: '3 / 2', text: '↓', key: 'ArrowDown' }
-      ];
-      
-      buttons.forEach(btn => {
-        const button = document.createElement('button');
-        button.style.cssText = buttonStyle;
-        button.style.gridArea = btn.grid;
-        button.innerHTML = btn.text;
-        button.dataset.key = btn.key;
-        
-        // Handle touch events
-        button.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          this.simulateKeyEvent(btn.key, true);
-        });
-        
-        button.addEventListener('touchend', (e) => {
-          e.preventDefault();
-          this.simulateKeyEvent(btn.key, false);
-        });
-        
-        controlsContainer.appendChild(button);
-      });
-      
-      // Add run toggle button
-      const runButton = document.createElement('button');
-      runButton.style.cssText = buttonStyle;
-      runButton.style.gridArea = '2 / 2';
-      runButton.innerHTML = 'RUN';
-      runButton.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        this.simulateKeyEvent('ShiftLeft', true);
-      });
-      controlsContainer.appendChild(runButton);
-      
-      document.body.appendChild(controlsContainer);
-    },
-  
-    simulateKeyEvent: function(key, isDown) {
-      // Create and dispatch a synthetic keyboard event
-      const eventType = isDown ? 'keydown' : 'keyup';
-      const event = new KeyboardEvent(eventType, {
-        key: key,
-        code: key,
-        bubbles: true
-      });
-      document.dispatchEvent(event);
     },
   
     setupDesktopControls: function () {
@@ -276,12 +192,6 @@ AFRAME.registerComponent('adaptive-controls', {
       // Remove instruction element
       if (this.instructionsEl && this.instructionsEl.parentNode) {
         this.instructionsEl.parentNode.removeChild(this.instructionsEl);
-      }
-      
-      // Remove mobile controls if present
-      const mobileControls = document.getElementById('mobile-controls');
-      if (mobileControls && mobileControls.parentNode) {
-        mobileControls.parentNode.removeChild(mobileControls);
       }
     }
   });
