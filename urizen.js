@@ -161,9 +161,9 @@ function getTerrainHeight(x, z) {
 
 function getTerrainColor(height) {
 
-    if (worldSeed!=1){
+    //if (worldSeed!=1){
     // Grassy height-based colouring.
-    if (height < -11.5) return '#002222';
+    if (height < -11.5) return '#00AACC';
     if (height < 0) return '#002200';     
     if (height < 5) return '#002900';     
     if (height < 10) return '#003000';    
@@ -171,7 +171,8 @@ function getTerrainColor(height) {
     if (height < 50) return '#004400';    
     if (height < 70) return '#6B776B';    
     return '#FFFFFF';
-    }
+    //}
+    /*
     else if (worldSeed===1){
     // Snowy appearance.
     if (height < -11.5) return '#002222';
@@ -183,6 +184,7 @@ function getTerrainColor(height) {
     if (height < 70) return '#FFFFFF';    // Mountain
     return '#FFFFFF';                     // Snow peaks
     }
+    */
 }
 
 // Terrain generator component.
@@ -200,11 +202,11 @@ AFRAME.registerComponent('terrain-generator', {
         // Start at -99,999 not 0,0, else gap behind subject.
         //this.worldSeed = this.hashseed(worldName);
         this.generateChunk(-99,999);
-        // Chunksize default 88.
-        // 204.
+        // Chunksize default 64.
+        // 4 of them.
         this.chunkSize=64;
         // Default number of chunks to gen in one go is 1, not 3.
-        this.chunksToGen=4;
+        this.chunksToGen=3;
 
         // Move player slightly to trigger generation of surrounding
         // terrain chunks.

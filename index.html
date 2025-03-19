@@ -6,6 +6,8 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
+    
+    <script src="fps-counter.js"></script>
     <!-- Enhanced AI system -->
     <script src="enhanced-ai-sys.js"></script>
     <!-- NPC Manager -->
@@ -13,6 +15,7 @@
     <!-- Pointer lock controls for free look -->
     <script src="adaptive-controls.js"></script>
     <script src="game.js"></script>
+    
     <style>
         body {
             margin: 0;
@@ -39,16 +42,56 @@
             border-radius: 5px;
             z-index: 999;
             display: none; /* Hidden by default, toggle with key press */
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+        }
+        .stat-label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .stat-value {
+            text-align: right;
+        }
+        .fps-high {
+            color: #7FFF7F;
+        }
+        .fps-medium {
+            color: #FFFF7F;
+        }
+        .fps-low {
+            color: #FF7F7F;
         }
     </style>
 </head>
 <body>
     <div id="connection-status">Connection status: Disconnected</div>
-    <div id="npc-stats">NPC Stats: 0 active</div>
+    <div id="npc-stats">
+        <div class="stat-row">
+            <span class="stat-label">FPS:</span>
+            <span class="stat-value" id="fps-value">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">NPCs:</span>
+            <span class="stat-value" id="npc-count">0 active / 0 total</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Max NPCs:</span>
+            <span class="stat-value" id="npc-max">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">NPC Time:</span>
+            <span class="stat-value" id="npc-time">0.0 ms</span>
+        </div>
+    </div>
 
     <!-- color: #00CBFF -->
     <a-scene adaptive-controls fog="type: linear; color: #0BE; far:365;">
-        
+        <script src="thalassa.js"></script>
         <a-assets>
         <!-- Preload our assets. -->
             <a-asset-item id="mGlasst" src="./assets/glasst.glb"></a-asset-item>
@@ -126,9 +169,7 @@
         <a-entity 
             id="npc-manager-entity" 
             npc-manager="
-                maxNPCs: 200;
-                spawnRadius: 100;
-                activationDistance: 150">
+                maxNPCs: 12;">
         </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->
@@ -143,6 +184,7 @@
     
     <!-- Add keyboard listener for toggling NPC stats display -->
     <script>
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             // Press 'N' to toggle NPC stats
             if (e.key === 'n' || e.key === 'N') {
@@ -199,6 +241,10 @@
         // Start updating stats after the scene loads
         document.querySelector('a-scene').addEventListener('loaded', function() {
             updateNPCStats();
+            const statsEl = document.getElementById('npc-stats');
+                if (statsEl) {
+                    statsEl.style.display = statsEl.style.display === 'none' ? 'block' : 'none';
+                }
         });
     </script>
 </body>
