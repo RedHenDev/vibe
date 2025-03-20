@@ -2,8 +2,8 @@
 AFRAME.registerSystem('npc-manager', {
     schema: {
       maxNPCs: {type: 'number', default: 12}, // Maximum number of NPCs to spawn
-      spawnRadius: {type: 'number', default: 128}, // Radius within which to spawn NPCs
-      activationDistance: {type: 'number', default: 132}, // Distance at which NPCs become active
+      spawnRadius: {type: 'number', default: 100}, // Radius within which to spawn NPCs
+      activationDistance: {type: 'number', default: 150}, // Distance at which NPCs become active
       performanceMode: {type: 'boolean', default: true} // Enable performance optimization
     },
   
@@ -40,14 +40,14 @@ AFRAME.registerSystem('npc-manager', {
       this.npcTypes = {
         'glasst': {
           model: '#mGlasst',
-          scale: '0.4 0.4 o.4',
+          scale: '1 1 1',
           height: 12,
           speed: 7,
           rSpeed: 0.9,
           clampY: false,
           wiggle: true,
           flee: false,
-          spawnChance: 0.7 // 70% chance to spawn this type
+          spawnChance: 1 // 70% chance to spawn this type
         },
         'runner': {
           model: '#mGlasst', // Same model but different behavior
@@ -58,7 +58,7 @@ AFRAME.registerSystem('npc-manager', {
           clampY: true,
           wiggle: true,
           flee: false,
-          spawnChance: 0.3 // 30% chance to spawn this type
+          spawnChance: 0 // 30% chance to spawn this type
         },
         'fleer': {
           model: '#mGlasst', // Same model but flees from player
@@ -69,13 +69,13 @@ AFRAME.registerSystem('npc-manager', {
           clampY: true,
           wiggle: true,
           flee: true,
-          spawnChance: 0.3 // 30% chance to spawn this type
+          spawnChance: 0 // 30% chance to spawn this type
         }
       };
     },
     
     tick: function(time) {
-      const startTime = performance.now();
+      //const startTime = performance.now();
       
       // Don't run every frame - check periodically for performance
       if (time - this.lastSpawnCheck > this.spawnInterval) {
@@ -84,16 +84,16 @@ AFRAME.registerSystem('npc-manager', {
       }
       
       // Calculate processing time for performance monitoring
-      const endTime = performance.now();
-      this.processingTime += (endTime - startTime);
+      //const endTime = performance.now();
+      //this.processingTime += (endTime - startTime);
       this.frameCount++;
       
       // Update average every second
-      if (time - this.lastSpawnCheck > 1000) {
-        this.avgProcessingTime = this.processingTime / this.frameCount;
-        this.processingTime = 0;
-        this.frameCount = 0;
-      }
+    //   if (time - this.lastSpawnCheck > 1000) {
+    //     this.avgProcessingTime = this.processingTime / this.frameCount;
+    //     this.processingTime = 0;
+    //     this.frameCount = 0;
+    //   }
     },
     
     getPerformanceStats: function() {
@@ -115,7 +115,7 @@ updateNPCs: function() {
     
     if (neededNPCs > 0) {
       const spawnCount = Math.min(neededNPCs, maxSpawnsPerUpdate);
-      console.log(`Spawning ${spawnCount} NPCs to reach target of ${this.data.maxNPCs}`);
+      //console.log(`Spawning ${spawnCount} NPCs to reach target of ${this.data.maxNPCs}`);
       
       for (let i = 0; i < spawnCount; i++) {
         this.spawnNPC();
@@ -236,7 +236,7 @@ updateNPCs: function() {
         spawnTime: Date.now()
       });
       
-      console.log(`Spawned ${npcType} NPC at ${spawnX.toFixed(1)}, ${spawnY.toFixed(1)}, ${spawnZ.toFixed(1)}`);
+      //console.log(`Spawned ${npcType} NPC at ${spawnX.toFixed(1)}, ${spawnY.toFixed(1)}, ${spawnZ.toFixed(1)}`);
     },
     
     calculateUpdateInterval: function(distance) {
@@ -261,7 +261,7 @@ updateNPCs: function() {
           
           // Remove from array - IMPORTANT: This changes array indices!
           this.npcs.splice(index, 1);
-          console.log(`Removed NPC, count now: ${this.npcs.length}`);
+          //console.log(`Removed NPC, count now: ${this.npcs.length}`);
         }
       },
     

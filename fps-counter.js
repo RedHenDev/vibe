@@ -4,7 +4,7 @@
     const fpsDisplay = document.createElement('div');
     fpsDisplay.id = 'fps-display';
     fpsDisplay.style.position = 'fixed';
-    fpsDisplay.style.top = '10px';
+    fpsDisplay.style.top = '60px';
     fpsDisplay.style.left = '50%';
     fpsDisplay.style.transform = 'translateX(-50%)';
     fpsDisplay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';

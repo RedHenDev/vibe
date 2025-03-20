@@ -6,10 +6,10 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
-    
     <script src="fps-counter.js"></script>
     <!-- Enhanced AI system -->
-    <script src="enhanced-ai-sys.js"></script>
+    <script src="ai_sys.js"></script>
+    <script src="ai_sys_legacy.js"></script>
     <!-- NPC Manager -->
     <script src="npc-manager.js"></script>
     <!-- Pointer lock controls for free look -->
@@ -156,9 +156,9 @@
         <!-- Your original glasst NPC - can leave for reference -->
         <a-entity gltf-model="#mGlasst"
             id="glasst"
-            scale="4 4 4"     
+            scale="8 8 8"     
             position="0 16 -20"
-            ai-locomotion="height:12;speed:0.7;targetID:#player;
+            ai-loco-legacy="height:12;speed:0.7;targetID:#player;
             rSpeed:0.9;clampY:false" 
         ></a-entity>
         
@@ -169,7 +169,7 @@
         <a-entity 
             id="npc-manager-entity" 
             npc-manager="
-                maxNPCs: 12;">
+                maxNPCs: 120;">
         </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->

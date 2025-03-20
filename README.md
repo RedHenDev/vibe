@@ -5,6 +5,10 @@ WT: Eigenlicht 'Intrinsic Light'
 
 to do
 
+-dev pool terrain chunks
+
+-dev pool npcs
+
 -feature randomized names
 
 -f view other players (must include ability to view VR client)
@@ -15,4 +19,8 @@ to do
 
 -f simple mobile button for locomotion
 
--f
+-b reinstate pitch of npcs
+
+-b npc spawning DONE
+
+-b npc spawning and states

@@ -27,6 +27,7 @@ AFRAME.registerComponent('terrain-movement', {
         this.running=false;
         this.flying=false;
         this.hud=document.querySelector("#hud").object3D;
+        this.minihud=document.querySelector("#micro-hud");
 
         // Luna bounce.
         this.lunaBounce=false;
@@ -72,9 +73,11 @@ AFRAME.registerComponent('terrain-movement', {
                 if (this.hud.visible){
                 this.hud.position.y=2;
                 this.hud.rotation.y=this.cam.rotation.y;
+                this.minihud.visible=false;
                 }
-                else this.hud.position.y=999;
-            
+                else {this.hud.position.y=999;
+                this.minihud.visible=false;
+                }
     },
 
     tick: function(time, delta) {
@@ -97,20 +100,19 @@ AFRAME.registerComponent('terrain-movement', {
             const pitch=rotation.x;
             const roll=rotation.z;
 
-        // Location of co-ords projected to a HUD.
-        // Location of co-ords projected to a HUD.
-// Add player count if available
+// Location of co-ords projected to a HUD.
+// Add player count if available.
 const playerCount = window.playerCount || 1;
 document.querySelector('#micro-hud-text').setAttribute(
     'value',`X ${Math.floor(position.x)} Z ${Math.floor(position.z)} | Souls: ${playerCount}`);
     //${Math.floor(position.y)}    
+    
     /*
         document.querySelector('#micro-hud-text').setAttribute(
             'value',`${Math.floor(position.x)} ${Math.floor(position.y)} ${Math.floor(position.z)}`);
         */
             // document.querySelector('#micro-hud-text').setAttribute(
         //     'value',`${Math.floor(rotation.y)} `);
-            
 
             // document.querySelector('#micro-hud-text').setAttribute(
             //     'value',`${pitch}`);

@@ -164,11 +164,11 @@ function getTerrainColor(height) {
     //if (worldSeed!=1){
     // Grassy height-based colouring.
     if (height < -11.5) return '#00AACC';
-    if (height < 0) return '#002200';     
-    if (height < 5) return '#002900';     
-    if (height < 10) return '#003000';    
-    if (height < 30) return '#003800';    
-    if (height < 50) return '#004400';    
+    if (height < 0) return '#003200';     
+    if (height < 5) return '#003900';     
+    if (height < 10) return '#004400';    
+    if (height < 30) return '#005800';    
+    if (height < 50) return '#006500';    
     if (height < 70) return '#6B776B';    
     return '#FFFFFF';
     //}
