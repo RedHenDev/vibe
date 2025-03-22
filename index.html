@@ -13,7 +13,8 @@
     <!-- NPC Manager -->
     <script src="npc-manager.js"></script>
     <!-- Pointer lock controls for free look -->
-    <script src="adaptive-controls.js"></script>
+    <!-- <script src="adaptive-controls.js"></script> -->
+    <script src="free-controls.js"></script>
     <script src="game.js"></script>
     
     <style>
@@ -90,7 +91,7 @@
     </div>
 
     <!-- color: #00CBFF -->
-    <a-scene adaptive-controls fog="type: linear; color: #0BE; far:365;">
+    <a-scene fog="type: linear; color: #0BE; far:365;">
         <script src="thalassa.js"></script>
         <a-assets>
         <!-- Preload our assets. -->
@@ -99,7 +100,8 @@
 
         <!-- Player with terrain locomotion system -->
         <a-entity id="player" position="0 25 0" terrain-movement="height: 4.6">
-            <a-camera id="cam" wasd-controls="enabled: false">
+            <!-- <a-camera id="cam" wasd-controls="enabled: false"> -->
+                <a-camera id="cam" free-controls="enabled: true; sensitivity: 2.0;" wasd-controls="enabled: false">    
                 <!-- micro HUD Interface -->
                 <a-entity id="micro-hud">
                     <!-- Background panel -->

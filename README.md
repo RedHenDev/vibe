@@ -3,7 +3,20 @@ VR multiplayer game
 
 WT: Eigenlicht 'Intrinsic Light'
 
+CONTROLS:
+- Click anywhere to enable mouse look
+- Press ESC to exit mouse look (not fullscreen)
+- Press F to toggle fullscreen mode
+- WASD/Arrow keys to move
+- Shift to toggle run
+
 to do
+
+-refac desktop mouselook DONE
+
+-f opening message for controls and goal
+
+-f simple mobile button for locomotion
 
 -dev pool terrain chunks
 
@@ -16,8 +29,6 @@ to do
 -f jump with space (menu some other button - Enter?)
 
 -f sensitivity to gradients -- for sliding and climb-labour
-
--f simple mobile button for locomotion
 
 -b reinstate pitch of npcs
 
