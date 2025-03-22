@@ -18,6 +18,12 @@ to do
 
 -f simple mobile button for locomotion
 
+-f button to access menu on mobile
+
+-f music
+
+-f sound effects
+
 -dev pool terrain chunks
 
 -dev pool npcs
