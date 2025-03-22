@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Eigenlite 0.31</title>
+    <title>Eigenlite 0.32</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
@@ -13,7 +13,6 @@
     <!-- NPC Manager -->
     <script src="npc-manager.js"></script>
     <!-- Pointer lock controls for free look -->
-    <!-- <script src="adaptive-controls.js"></script> -->
     <script src="free-controls.js"></script>
     <script src="game.js"></script>
     
@@ -171,7 +170,8 @@
         <a-entity 
             id="npc-manager-entity" 
             npc-manager="
-                maxNPCs: 12;">
+            maxNPCs: 12;
+            poolSize: 20;">
         </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->

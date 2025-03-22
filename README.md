@@ -16,7 +16,7 @@ to do
 
 -f opening message for controls and goal
 
--f simple mobile button for locomotion
+DONE-f simple mobile button for locomotion 
 
 -f button to access menu on mobile
 

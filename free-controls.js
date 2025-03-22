@@ -173,7 +173,7 @@ AFRAME.registerComponent('free-controls', {
       console.log("Movement toggled:", this.isMoving ? "ON" : "OFF");
   
       if (this.moveButton) {
-        this.moveButton.textContent = this.isMoving ? 'Move: ON' : 'Move: OFF';
+        this.moveButton.textContent = this.isMoving ? 'walk: ON' : 'walk: OFF';
         if (this.isMoving) {
           this.moveButton.style.backgroundColor = 'rgba(76, 175, 80, 0.7)';
           this.moveButton.classList.add('active');
@@ -183,7 +183,7 @@ AFRAME.registerComponent('free-controls', {
         }
       }
   
-      this.showNotification(this.isMoving ? "Movement enabled" : "Movement disabled");
+      //this.showNotification(this.isMoving ? "Movement enabled" : "Movement disabled");
     },
   
     createMovementButton: function() {
