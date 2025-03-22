@@ -1,8 +1,9 @@
-// Improved pointer lock controls with banner overlay
+// Free controls with pointer lock for desktop and touch support for mobile
 AFRAME.registerComponent('free-controls', {
     schema: {
       enabled: {default: true},
       sensitivity: {default: 2.0},
+      mobileSensitivity: {default: 1.0},        // Separate sensitivity for touch devices
       bannerText: {default: 'Press ESC to exit mouse look, F to toggle fullscreen'},
       showFullscreenTip: {default: true}
     },
@@ -11,14 +12,22 @@ AFRAME.registerComponent('free-controls', {
       this.canvasEl = document.querySelector('canvas');
       this.pointerLocked = false;
       
+      // Check if we're on a mobile device
+      this.isMobile = AFRAME.utils.device.isMobile();
+      console.log("Device detected as mobile:", this.isMobile);
+      
       // Important: Get the correct camera reference
-      // this.el is the entity with the component (the camera)
       this.cameraEl = this.el;
       this.camera = this.el.object3D;
       
       // Log for debugging
       console.log("Camera element:", this.cameraEl);
       console.log("Camera object3D:", this.camera);
+      
+      // Touch state tracking
+      this.touchActive = false;
+      this.lastTouchX = 0;
+      this.lastTouchY = 0;
       
       // Bind methods
       this.onMouseDown = this.onMouseDown.bind(this);
@@ -27,12 +36,16 @@ AFRAME.registerComponent('free-controls', {
       this.onMouseMove = this.onMouseMove.bind(this);
       this.onKeyDown = this.onKeyDown.bind(this);
       this.onFullscreenChange = this.onFullscreenChange.bind(this);
+      this.onTouchStart = this.onTouchStart.bind(this);
+      this.onTouchMove = this.onTouchMove.bind(this);
+      this.onTouchEnd = this.onTouchEnd.bind(this);
       
-      // Setup event listeners
-      this.setupMouseControls();
-      
-      // Create our custom banner that will cover the browser's banner
-      //this.createCustomBanner();
+      // Setup event listeners based on device type
+      if (this.isMobile) {
+        this.setupTouchControls();
+      } else {
+        this.setupMouseControls();
+      }
       
       // Track fullscreen state
       this.isFullscreen = !!(document.fullscreenElement || 
@@ -45,33 +58,8 @@ AFRAME.registerComponent('free-controls', {
       document.addEventListener('mozfullscreenchange', this.onFullscreenChange);
       document.addEventListener('MSFullscreenChange', this.onFullscreenChange);
       
-      console.log("Improved pointer lock controls initialized");
+      console.log("Free controls initialized for", this.isMobile ? "mobile" : "desktop");
     },
-    
-    /*
-    createCustomBanner: function() {
-      // Create a banner that will display above the browser's pointer lock banner
-      // to give users an alternative instruction
-      this.customBanner = document.createElement('div');
-      this.customBanner.style.position = 'fixed';
-      this.customBanner.style.top = '0';
-      this.customBanner.style.left = '0';
-      this.customBanner.style.width = '100%';
-      this.customBanner.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-      this.customBanner.style.color = 'white';
-      this.customBanner.style.padding = '10px';
-      this.customBanner.style.textAlign = 'center';
-      this.customBanner.style.zIndex = '10000'; // Very high z-index to be above browser UI
-      this.customBanner.style.fontSize = '14px';
-      this.customBanner.style.fontFamily = 'Arial, sans-serif';
-      this.customBanner.style.transition = 'opacity 0.3s ease-in-out';
-      this.customBanner.style.opacity = '0';
-      this.customBanner.style.pointerEvents = 'none'; // Let mouse events pass through
-      this.customBanner.textContent = this.data.bannerText;
-      
-      document.body.appendChild(this.customBanner);
-    },
-    */
     
     setupMouseControls: function() {
       // Disable A-Frame's default look controls
@@ -96,6 +84,60 @@ AFRAME.registerComponent('free-controls', {
       document.addEventListener('keydown', this.onKeyDown);
     },
     
+    setupTouchControls: function() {
+      console.log("Setting up touch controls for mobile");
+      
+      // Disable A-Frame's default look controls for consistency
+      if (this.cameraEl.getAttribute('look-controls') !== null) {
+        this.cameraEl.setAttribute('look-controls', 'enabled', false);
+        console.log("Disabled A-Frame's default look controls on mobile");
+      }
+      
+      // Add touch event listeners
+      this.canvasEl.addEventListener('touchstart', this.onTouchStart, false);
+      this.canvasEl.addEventListener('touchmove', this.onTouchMove, false);
+      this.canvasEl.addEventListener('touchend', this.onTouchEnd, false);
+      
+      // Prevent default touch behaviors like scrolling
+      this.canvasEl.style.touchAction = 'none';
+      document.body.style.touchAction = 'none';
+      
+      // Create a small indicator for touch mode
+      this.createTouchIndicator();
+    },
+    
+    createTouchIndicator: function() {
+      // Create a small indicator showing touch mode is active
+      const indicator = document.createElement('div');
+      indicator.style.position = 'fixed';
+      indicator.style.bottom = '10px';
+      indicator.style.right = '10px';
+      indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      indicator.style.color = 'white';
+      indicator.style.padding = '5px 8px';
+      indicator.style.borderRadius = '4px';
+      indicator.style.fontSize = '12px';
+      indicator.style.fontFamily = 'Arial, sans-serif';
+      indicator.style.zIndex = '999';
+      indicator.style.opacity = '0.7';
+      indicator.textContent = 'Drag to look';
+      
+      document.body.appendChild(indicator);
+      
+      // Fade out after 5 seconds
+      setTimeout(function() {
+        indicator.style.transition = 'opacity 1s ease-out';
+        indicator.style.opacity = '0';
+        setTimeout(function() {
+          if (indicator.parentNode) {
+            indicator.parentNode.removeChild(indicator);
+          }
+        }, 1000);
+      }, 5000);
+      
+      this.touchIndicator = indicator;
+    },
+    
     onMouseDown: function(event) {
       // Don't request if we're clicking on UI elements
       if (event.target.closest('.a-enter-vr') || 
@@ -115,6 +157,72 @@ AFRAME.registerComponent('free-controls', {
       }
     },
     
+    onTouchStart: function(event) {
+      if (!this.data.enabled) return;
+      
+      // Prevent default behavior (scrolling, zooming)
+      event.preventDefault();
+      
+      // Store the initial touch position
+      if (event.touches.length === 1) {
+        this.touchActive = true;
+        this.lastTouchX = event.touches[0].clientX;
+        this.lastTouchY = event.touches[0].clientY;
+        
+        console.log("Touch start at:", this.lastTouchX, this.lastTouchY);
+      }
+    },
+    
+    onTouchMove: function(event) {
+      if (!this.touchActive || !this.data.enabled) return;
+      
+      // Prevent default behavior
+      event.preventDefault();
+      
+      if (event.touches.length === 1) {
+        // Get current touch position
+        const touchX = event.touches[0].clientX;
+        const touchY = event.touches[0].clientY;
+        
+        // Calculate movement
+        const movementX = touchX - this.lastTouchX;
+        const movementY = touchY - this.lastTouchY;
+        
+        // Debug first few touch movements
+        if (this.touchDebugCount === undefined) {
+          this.touchDebugCount = 0;
+        }
+        
+        if (this.touchDebugCount < 5) {
+          console.log("Touch movement:", movementX, movementY);
+          this.touchDebugCount++;
+        }
+        
+        // Update camera rotation based on touch movement
+        // Note: mobile usually requires different sensitivity than mouse
+        const sensitivity = this.data.mobileSensitivity / 200; // Higher divisor for touch
+        
+        // Apply X movement to Y rotation (yaw)
+        this.camera.rotation.y -= movementX * sensitivity;
+        
+        // Apply Y movement to X rotation (pitch) with clamping
+        const currentPitch = this.camera.rotation.x;
+        const newPitch = currentPitch - movementY * sensitivity;
+        
+        // Clamp vertical look between -90 and 90 degrees
+        this.camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, newPitch));
+        
+        // Store current position for next move
+        this.lastTouchX = touchX;
+        this.lastTouchY = touchY;
+      }
+    },
+    
+    onTouchEnd: function(event) {
+      // End touch tracking
+      this.touchActive = false;
+    },
+    
     onPointerLockChange: function() {
       // Check if we now have pointerlock
       if (document.pointerLockElement === this.canvasEl ||
@@ -125,17 +233,11 @@ AFRAME.registerComponent('free-controls', {
         this.pointerLocked = true;
         document.addEventListener('mousemove', this.onMouseMove, false);
         
-        // Show our custom banner
-        //this.customBanner.style.opacity = '1';
-        
         console.log('Pointer locked');
       } else {
         // Pointer is unlocked, remove mousemove listener
         this.pointerLocked = false;
         document.removeEventListener('mousemove', this.onMouseMove, false);
-        
-        // Hide our custom banner
-        //this.customBanner.style.opacity = '0';
         
         console.log('Pointer unlocked');
         
@@ -195,15 +297,6 @@ AFRAME.registerComponent('free-controls', {
                              document.webkitFullscreenElement || 
                              document.mozFullScreenElement || 
                              document.msFullscreenElement);
-      
-        /*
-      // Update banner text based on fullscreen state
-      if (this.isFullscreen) {
-        this.customBanner.textContent = 'Press ESC to exit mouse look, F to exit fullscreen';
-      } else {
-        this.customBanner.textContent = this.data.bannerText;
-      }
-        */
     },
     
     toggleFullscreen: function() {
@@ -265,7 +358,7 @@ AFRAME.registerComponent('free-controls', {
     },
     
     remove: function() {
-      // Clean up event listeners
+      // Clean up event listeners - desktop
       this.canvasEl.removeEventListener('click', this.onMouseDown);
       
       document.removeEventListener('pointerlockchange', this.onPointerLockChange);
@@ -277,16 +370,22 @@ AFRAME.registerComponent('free-controls', {
       document.removeEventListener('webkitpointerlockerror', this.onPointerLockError);
       
       document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('keydown', this.onKeyDown);
       
+      // Clean up event listeners - mobile
+      this.canvasEl.removeEventListener('touchstart', this.onTouchStart);
+      this.canvasEl.removeEventListener('touchmove', this.onTouchMove);
+      this.canvasEl.removeEventListener('touchend', this.onTouchEnd);
+      
+      // Clean up keyboard and fullscreen listeners
+      document.removeEventListener('keydown', this.onKeyDown);
       document.removeEventListener('fullscreenchange', this.onFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', this.onFullscreenChange);
       document.removeEventListener('mozfullscreenchange', this.onFullscreenChange);
       document.removeEventListener('MSFullscreenChange', this.onFullscreenChange);
       
-      // Remove custom banner
-      if (this.customBanner && this.customBanner.parentNode) {
-        this.customBanner.parentNode.removeChild(this.customBanner);
+      // Remove touch indicator if it exists
+      if (this.touchIndicator && this.touchIndicator.parentNode) {
+        this.touchIndicator.parentNode.removeChild(this.touchIndicator);
       }
     }
   });

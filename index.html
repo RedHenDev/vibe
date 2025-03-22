@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Eigenlite 0.2</title>
+    <title>Eigenlite 0.3</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
@@ -171,7 +171,7 @@
         <a-entity 
             id="npc-manager-entity" 
             npc-manager="
-                maxNPCs: 120;">
+                maxNPCs: 12;">
         </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->
@@ -188,6 +188,7 @@
     <script>
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
+            
             // Press 'N' to toggle NPC stats
             if (e.key === 'n' || e.key === 'N') {
                 const statsEl = document.getElementById('npc-stats');
