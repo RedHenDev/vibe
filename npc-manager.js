@@ -3,8 +3,8 @@ AFRAME.registerSystem('npc-manager', {
     schema: {
       maxNPCs: {type: 'number', default: 12}, // Maximum number of NPCs to spawn
       poolSize: {type: 'number', default: 12}, // Size of the NPC pool (should be >= maxNPCs)
-      spawnRadius: {type: 'number', default: 100}, // Radius within which to spawn NPCs
-      activationDistance: {type: 'number', default: 150}, // Distance at which NPCs become active
+      spawnRadius: {type: 'number', default: 360}, // Radius within which to spawn NPCs
+      activationDistance: {type: 'number', default: 120}, // Distance at which NPCs become active
       performanceMode: {type: 'boolean', default: true} // Enable performance optimization
     },
   
@@ -54,29 +54,29 @@ AFRAME.registerSystem('npc-manager', {
           clampY: false,
           wiggle: true,
           flee: false,
-          spawnChance: 1 // 100% chance to spawn this type
+          spawnChance: 0.33 // 100% chance to spawn this type
         },
         'runner': {
-          model: '#mGlasst', // Same model but different behavior
+          model: '#mCublit', // Different model!
           scale: '32 32 32',
           height: 64,
           speed: 1.2,
           rSpeed: 1.2,
-          clampY: true,
-          wiggle: true,
+          clampY: false,
+          wiggle: false,
           flee: false,
-          spawnChance: 0 // 0% chance to spawn this type
+          spawnChance: 0.33 // 0% chance to spawn this type
         },
         'fleer': {
           model: '#mGlasst', // Same model but flees from player
-          scale: '2 2 2',
+          scale: '7 7 7',
           height: 6,
           speed: 0.8,
           rSpeed: 1.0,
-          clampY: true,
+          clampY: false,
           wiggle: true,
           flee: true,
-          spawnChance: 0 // 0% chance to spawn this type
+          spawnChance: 0.33 // 0% chance to spawn this type
         }
       };
     },

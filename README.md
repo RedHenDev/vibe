@@ -12,9 +12,9 @@ CONTROLS:
 
 to do
 
--refac desktop mouselook DONE
+DONE-refac desktop mouselook DONE
 
--f opening message for controls and goal
+DONE-f opening message for controls and goal
 
 DONE-f simple mobile button for locomotion 
 
@@ -26,7 +26,7 @@ DONE-f simple mobile button for locomotion
 
 -dev pool terrain chunks
 
--dev pool npcs
+DONE -dev pool npcs
 
 -feature randomized names
 
@@ -38,6 +38,6 @@ DONE-f simple mobile button for locomotion
 
 -b reinstate pitch of npcs
 
--b npc spawning DONE
+DONE-b npc spawning DONE
 
 -b npc spawning and states
