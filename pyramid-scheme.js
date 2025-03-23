@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   AFRAME.registerComponent('pyramid-system', {
     schema: {
       chunkSize: { type: 'number', default: 64 },        // Size of each chunk in meters
-      renderDistance: { type: 'number', default: 128 },   // Max distance to render instances
-      instancesPerChunk: { type: 'number', default: 5 },  // Instances per chunk
+      renderDistance: { type: 'number', default: 360 },   // Max distance to render instances
+      instancesPerChunk: { type: 'number', default: 1 },  // Instances per chunk
       updateThreshold: { type: 'number', default: 32 },   // Distance player must move to trigger update
       minHeight: { type: 'number', default: 3 },         // Minimum pyramid height
-      maxHeight: { type: 'number', default: 5 },         // Maximum pyramid height
+      maxHeight: { type: 'number', default: 15 },         // Maximum pyramid height
       baseColor: { type: 'color', default: '#CC00DD' },   // Base color (wheat)
       chunksPerFrame: { type: 'number', default: 2 },     // Chunks to generate per frame
       colorVariation: { type: 'number', default: 0.2 },   // Color variation amount (0-1)
@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
       waterLevel: { type: 'number', default: -11 },       // Water level threshold
       sides: { type: 'number', default: 4 },              // Number of sides (3=triangle, 4=square base)
       baseWidth: { type: 'number', default: 4 },         // Base width of pyramid
-      useGlowMaterial: { type: 'boolean', default: false } // Use glowing material?
+      useGlowMaterial: { type: 'boolean', default: false }, // Use glowing material?
+      yOffset: { type: 'number', default: -7 }
     },
     
     init: function () {
@@ -249,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const x = (i + xPercent) * chunkSize;
         const z = (j + zPercent) * chunkSize;
-        const y = this.getHeight(x, z);
+        const y = this.getHeight(x, z) + this.data.yOffset;
         
         // Skip if in water and avoidWater is true
         if (this.data.avoidWater && y < this.data.waterLevel) {

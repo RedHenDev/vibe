@@ -20,7 +20,29 @@ CONTROLS:
 - WASD/Arrow keys to move
 - Shift to toggle run
 
+triage
+
+1- avatars with nice models
+
+2- sync behaviours and test terrain feature for multi-p
+
+3- collectibles system (that can lift from different kinds of script, e.g. where pyramids might supply its items, but in other script where I might manually place things, or where NPCs have dropped them)
+
+
 to do
+
+-i just one track for entire game (to keep lightweight)
+
+-i ambient music track: is there a term for music that does not exhaust the ear, but whose melodies and other properties find themselves welcome and even addicting for the listener?
+
+-refac adjust positions and possibly colours of ui buttons (music and menu) - i.e. out of way of and in line with other elements.
+
+DONE-refac temporary 'fix' -- remove miniHud
+
+-refac remove micro-hud as visible in default. Perhaps 'port' to menu
+have commented out in a-loco.js. Also will comment out or hide in index.html
+
+-refac port music button to menu
 
 -f metavibe portal
 

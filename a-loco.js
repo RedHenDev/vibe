@@ -100,12 +100,14 @@ AFRAME.registerComponent('terrain-movement', {
             const pitch=rotation.x;
             const roll=rotation.z;
 
+/*
 // Location of co-ords projected to a HUD.
 // Add player count if available.
 const playerCount = window.playerCount || 1;
 document.querySelector('#micro-hud-text').setAttribute(
     'value',`X ${Math.floor(position.x)} Z ${Math.floor(position.z)} | Souls: ${playerCount}`);
     //${Math.floor(position.y)}    
+*/
     
     /*
         document.querySelector('#micro-hud-text').setAttribute(

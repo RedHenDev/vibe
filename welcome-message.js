@@ -5,12 +5,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     AFRAME.registerComponent('welcome-message', {
       schema: {
-        title: { default: 'CLICK TO START - EIGENLITE VIBE 1.0' },
+        title: { default: 'CLICK TO VIBE - Eigengrau Light v1.0' },
         duration: { type: 'number', default: 24000 }, // How long to show message (ms)
         mobileText: { type: 'string', default: 'swipe to turn • walk button to move' },
         desktopText: { type: 'string', default: 'SHIFT toggles run • SPACE for menu' },
         vrText: { type: 'string', default: 'Tilt head left toggles walk • Tilt head right toggles menu' },
-        goalText: { type: 'string', default: 'Explore the infinite world of EigenLite • Find other players • Rescue Mathematics' }
+        goalText: { type: 'string', default: 'Navigate this infinite world • Find other players • Beware the night!' }
       },
   
       init: function() {
