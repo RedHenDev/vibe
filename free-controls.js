@@ -189,7 +189,7 @@ AFRAME.registerComponent('free-controls', {
     createMovementButton: function() {
       this.moveButton = document.createElement('button');
       this.moveButton.className = 'move-toggle-btn';
-      this.moveButton.textContent = 'Move: OFF';
+      this.moveButton.textContent = 'walk: OFF';
   
       this.moveButton.style.position = 'fixed';
       this.moveButton.style.padding = '15px 25px';

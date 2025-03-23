@@ -17,18 +17,66 @@ const wss = new WebSocket.Server({ server });
 // Store connected players
 const players = {};
 
+// Store used names to avoid duplicates
+const usedNames = new Set();
+
+// Name generation data for the server
+const mathematicians = [
+    'Euclid', 'Pythagoras', 'Archimedes', 'Newton', 'Gauss', 'Euler', 'Fermat', 
+    'Riemann', 'Ramanujan', 'Einstein', 'Hilbert', 'Turing', 'Gödel', 'Lovelace', 
+    'Noether', 'Galois', 'Cantor', 'Cauchy', 'Lagrange', 'Leibniz', 'Pascal', 
+    'Poincaré', 'Boole', 'Fibonacci', 'Bernoulli', 'Descartes', 'Fourier', 
+    'Kolmogorov', 'Laplace', 'Hypatia'
+];
+
+const mathConcepts = [
+    'Prime', 'Integer', 'Vector', 'Matrix', 'Tensor', 'Calculus', 'Infinity', 
+    'Fractal', 'Quantum', 'Topology', 'Symmetry', 'Algorithm', 'Quaternion', 
+    'Polynomial', 'Function', 'Manifold', 'Theorem', 'Equation', 'Probability', 
+    'Derivative', 'Integral', 'Sequence', 'Series', 'Group', 'Ring', 'Field', 
+    'Logic', 'Set', 'Graph', 'Dimension'
+];
+
+// Generate a name that isn't already in use
+function generateUniqueName(requestedName = null) {
+    // If a name is requested and not already used, grant it
+    if (requestedName && !usedNames.has(requestedName)) {
+        usedNames.add(requestedName);
+        return requestedName;
+    }
+    
+    // Otherwise generate a unique name
+    let attempts = 0;
+    let name;
+    
+    do {
+        const mathematician = mathematicians[Math.floor(Math.random() * mathematicians.length)];
+        const concept = mathConcepts[Math.floor(Math.random() * mathConcepts.length)];
+        name = `${mathematician} ${concept}`;
+        attempts++;
+        
+        // If we've made too many attempts, add a number to ensure uniqueness
+        if (attempts > 50) {
+            name = `${name} ${Math.floor(Math.random() * 1000)}`;
+        }
+    } while (usedNames.has(name));
+    
+    usedNames.add(name);
+    return name;
+}
+
+// Get the number of connected players
+function getPlayerCount() {
+    return Object.keys(players).length;
+}
+
 // Handle WebSocket connections
 wss.on('connection', (ws) => {
     // Generate a unique ID for the player
     const playerId = uuidv4();
+    let playerName = null;
     
     console.log(`New player connected: ${playerId}`);
-    
-    // Send the player ID
-    ws.send(JSON.stringify({
-        type: 'id',
-        id: playerId
-    }));
     
     // Handle messages from clients
     ws.on('message', (message) => {
@@ -37,16 +85,31 @@ wss.on('connection', (ws) => {
             
             switch (data.type) {
                 case 'join':
-                    // Add new player
+                    // Assign a unique name (either requested or generated)
+                    playerName = generateUniqueName(data.name);
+                    
+                    // Add new player with all data
                     players[playerId] = {
                         position: data.position,
-                        color: data.color
+                        rotation: data.rotation || { x: 0, y: 0, z: 0 },
+                        color: data.color,
+                        model: data.model,
+                        name: playerName
                     };
                     
-                    // Broadcast join event
+                    // Send the player ID and name
+                    ws.send(JSON.stringify({
+                        type: 'id',
+                        id: playerId,
+                        name: playerName,
+                        playerCount: getPlayerCount()
+                    }));
+                    
+                    // Broadcast join event with name
                     broadcastToAll({
                         type: 'join',
-                        id: playerId
+                        id: playerId,
+                        name: playerName
                     });
                     
                     // Send current players to all players
@@ -54,12 +117,25 @@ wss.on('connection', (ws) => {
                         type: 'players',
                         players: players
                     });
+                    
+                    // Broadcast player count update
+                    broadcastToAll({
+                        type: 'playerCount',
+                        count: getPlayerCount()
+                    });
+                    
+                    console.log(`Player ${playerId} joined as "${playerName}"`);
                     break;
                     
                 case 'update':
-                    // Update player position
+                    // Update player position and rotation
                     if (players[playerId]) {
                         players[playerId].position = data.position;
+                        
+                        // Update rotation if provided
+                        if (data.rotation) {
+                            players[playerId].rotation = data.rotation;
+                        }
                         
                         // Broadcast updated players
                         broadcastToAll({
@@ -76,7 +152,12 @@ wss.on('connection', (ws) => {
     
     // Handle client disconnection
     ws.on('close', () => {
-        console.log(`Player disconnected: ${playerId}`);
+        console.log(`Player disconnected: ${playerId} (${players[playerId]?.name || 'Unknown'})`);
+        
+        // Free up the name when a player disconnects
+        if (players[playerId] && players[playerId].name) {
+            usedNames.delete(players[playerId].name);
+        }
         
         // Remove player
         delete players[playerId];
@@ -84,13 +165,20 @@ wss.on('connection', (ws) => {
         // Broadcast leave event
         broadcastToAll({
             type: 'leave',
-            id: playerId
+            id: playerId,
+            name: playerName
         });
         
         // Broadcast updated players list
         broadcastToAll({
             type: 'players',
             players: players
+        });
+        
+        // Broadcast player count update
+        broadcastToAll({
+            type: 'playerCount',
+            count: getPlayerCount() 
         });
     });
 });

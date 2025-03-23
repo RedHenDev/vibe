@@ -52,6 +52,7 @@ AFRAME.registerSystem('npc-manager', {
           speed: 7,
           rSpeed: 0.9,
           clampY: false,
+          adjustY: 3.14,
           wiggle: true,
           flee: false,
           spawnChance: 0.33 // 100% chance to spawn this type
@@ -74,8 +75,9 @@ AFRAME.registerSystem('npc-manager', {
           speed: 0.8,
           rSpeed: 1.0,
           clampY: false,
+          adjustY: 3.14,
           wiggle: true,
-          flee: true,
+          flee: false,
           spawnChance: 0.33 // 0% chance to spawn this type
         }
       };

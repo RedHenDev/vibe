@@ -5,13 +5,36 @@ const config = {
     playerModels: ['#mGlasst', '#mCublit'] // Available models for player avatars
 };
 
+// Create a billboard component that makes entities always face the camera
+AFRAME.registerComponent('billboard', {
+    init: function() {
+        this.camera = document.querySelector('#cam').object3D;
+    },
+    
+    tick: function() {
+        if (!this.camera) return;
+        
+        // Get the camera position
+        const cameraPosition = new THREE.Vector3();
+        this.camera.getWorldPosition(cameraPosition);
+        
+        // Make this entity face the camera
+        this.el.object3D.lookAt(cameraPosition);
+        
+        // Prevent X and Z rotation to keep text upright
+        const rotation = this.el.object3D.rotation;
+        rotation.x = 0;
+        rotation.z = 0;
+    }
+});
+
 // Name generation data
 const mathematicians = [
     'Euclid', 'Pythagoras', 'Archimedes', 'Newton', 'Gauss', 'Euler', 'Fermat', 
     'Riemann', 'Ramanujan', 'Einstein', 'Hilbert', 'Turing', 'Gödel', 'Lovelace', 
     'Noether', 'Galois', 'Cantor', 'Cauchy', 'Lagrange', 'Leibniz', 'Pascal', 
     'Poincaré', 'Boole', 'Fibonacci', 'Bernoulli', 'Descartes', 'Fourier', 
-    'Kolmogorov', 'Laplace', 'Hypatia'
+    'Kolmogorov', 'Laplace', 'Hypatia', 'Karpathy'
 ];
 
 const mathConcepts = [
@@ -170,14 +193,26 @@ function syncPlayerPosition() {
             z: position.z
         },
         rotation: {
-            x: rotation.x,
-            y: rotation.y, 
+            x: -rotation.x,
+            y: rotation.y+3.14, 
             z: rotation.z
         }
     }));
     
     // Update global player count
     window.playerCount = Object.keys(remotePlayers).length + 1;
+    
+    // Update nametags to face camera (as an additional fallback)
+    for (const id in remotePlayers) {
+        const playerEntity = document.getElementById(`player-${id}`);
+        if (playerEntity) {
+            const nameTag = playerEntity.querySelector('a-text');
+            if (nameTag && !nameTag.hasAttribute('billboard')) {
+                // If a nametag doesn't have the billboard component, add it
+                nameTag.setAttribute('billboard', '');
+            }
+        }
+    }
 }
 
 // Update other player entities based on server data
@@ -209,7 +244,7 @@ function updatePlayers(playerData) {
             nameTag.setAttribute('align', 'center');
             nameTag.setAttribute('scale', '8 8 8'); // Scale for readability
             nameTag.setAttribute('color', data.color || '#FFFFFF');
-            nameTag.setAttribute('look-at', '[camera]'); // Always face camera
+            nameTag.setAttribute('billboard', ''); // Always face camera using a custom component
             
             // Add color to model if specified
             if (data.color) {

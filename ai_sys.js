@@ -8,7 +8,7 @@ AFRAME.registerComponent('ai-locomotion', {
         targetID: {type: 'string', default: '#player'},
         rSpeed: {type: 'number', default: 1},
         clampY: {type: 'boolean', default: true},
-        adjustY: {type: 'number', default: 0},
+        adjustY: {type: 'number', default: 3.14}, // In radians.
         active: {type: 'boolean', default: true},
         updateInterval: {type: 'number', default: 1}, // Update every N frames
         terrainOffset: {type: 'number', default: 0}, // Random offset for terrain sampling
@@ -146,8 +146,9 @@ AFRAME.registerComponent('ai-locomotion', {
         const targetDirection = this.calculateTargetDirection();
         
         // Calculate the yaw angle from direction vector
-        const targetYaw = Math.atan2(targetDirection.x, targetDirection.z) + this.data.adjustY;
-        
+        const targetYaw = Math.atan2(targetDirection.x, targetDirection.z) + 
+            this.data.adjustY;
+
         // Set as the target rotation (will be smoothly applied in tick)
         this.targetRotationY = targetYaw;
         
