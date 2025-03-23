@@ -119,7 +119,7 @@ AFRAME.registerComponent('grass-system', {
       // If there are no chunks to process, stop
       if (this.chunkQueue.length === 0) {
         this.isProcessingQueue = false;
-        console.log('Finished loading all grass chunks');
+        //console.log('Finished loading all grass chunks');
         return;
       }
       

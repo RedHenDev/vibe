@@ -3,9 +3,10 @@ VR multiplayer game
 
 https://docs.google.com/forms/d/e/1FAIpQLSdB8LEZIoYuh4_tO89s2DbMT7nqyDvJGrgrrUoBquLA4XCBRA/viewform
 
-WT: Eigenlicht 'Intrinsic Light'
+WT: 'Eigengrau Light'
 
 attributions
+(see bottom of doc for more details about licensing etc)
 
 Claude 3.7 (Anthropic) - coding
 Grok 3 beta (X) - coding
@@ -19,6 +20,8 @@ CONTROLS:
 - Press F to toggle fullscreen mode
 - WASD/Arrow keys to move
 - Shift to toggle run
+- m to toggle music
+- p next track
 
 triage
 
@@ -28,10 +31,21 @@ triage
 
 3- collectibles system (that can lift from different kinds of script, e.g. where pyramids might supply its items, but in other script where I might manually place things, or where NPCs have dropped them)
 
+ad como key
+
+-dev = develop new features from existing system
+-f = create new feature
+-i = general idea that might become feature or something developed
+-b = bug
+-refac = something to refactor
 
 to do
 
--i just one track for entire game (to keep lightweight)
+-dev woods in only certain areas; option to decide manually as well as 'background' deployment of wooded areas from world seed.
+
+-f bioluminescent mushrooms and, or, will 'o the wisps.
+
+-i just one track for entire game (to keep lightweight). OK, maybe two -- since we have ambient and a lyrical.
 
 -i ambient music track: is there a term for music that does not exhaust the ear, but whose melodies and other properties find themselves welcome and even addicting for the listener?
 
@@ -92,3 +106,23 @@ DONE -dev pool npcs
 DONE-b npc spawning DONE
 
 -b npc spawning and states
+
+
+**
+
+Additional attributions info
+
+'if you wrote the lyrics for your song(s), you own those lyrics'
+
+You can use music created with Suno AI for commercial purposes if you have a Pro or Premier subscription, which grants you a commercial use license, but not with the Basic (free) plan. 
+Here's a more detailed explanation:
+Basic (Free) Plan:
+If you create music using the free version of Suno, Suno retains ownership of the songs, and you are only allowed to use them for non-commercial purposes. 
+Pro and Premier Plans:
+If you create music while subscribed to a Pro or Premier plan, you own the songs and are granted a commercial use license, allowing you to monetize them. 
+Commercial Use License:
+This license allows you to distribute your songs on platforms like Spotify and Apple Music, and use them in content you post on platforms like YouTube and TikTok. 
+No Retroactive Licensing:
+Starting a subscription after creating songs with the free plan does not give you retroactive commercial use rights for those songs. 
+Ownership of Material:
+As with any time you monetize your songs, you must be the exclusive rights holder of 100% of the material. 
