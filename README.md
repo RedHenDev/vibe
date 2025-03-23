@@ -12,6 +12,12 @@ CONTROLS:
 
 to do
 
+-f gamemode -- event triggers or just timed, 'night time' when sky goes dark and perhaps the more disturbing mobs appear
+
+-f headlights
+
+-f clouds
+
 DONE-refac desktop mouselook DONE
 
 DONE-f opening message for controls and goal
