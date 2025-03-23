@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Eigenlite Vibe 0.4</title>
+    <title>Eigenlite Vibe 0.5</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
@@ -155,6 +155,7 @@
         
         <!-- Terrain generation -->
         <a-entity terrain-generator></a-entity>
+        <a-entity grass-system></a-entity>
 
         <!-- Your original glasst NPC - can leave for reference -->
         <a-entity gltf-model="#mGlasst"
@@ -254,5 +255,6 @@
     </script>
     <script src="welcome-message.js"></script>
     <script src="menu-button.js"></script>
+    <script src="grass-lod.js"></script>
 </body>
 </html>
