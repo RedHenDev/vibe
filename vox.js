@@ -38,15 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
       this.tracks = [
         './assets/pixel_wonder.mp3',
         './assets/shadows_of_the_system.mp3',
-        './assets/eigengrau_light.mp3'
-        // Add all your tracks here
+        './assets/eigengrau_light.mp3',
+        './assets/neon.mp3'
+        // Add all your tracks here.
       ];
       
-      // Track names for display
+      // Track names for display.
       this.trackNames = [
-        'Ambient Theme 1',
-        'Exploration Theme',
-        'Mystery Theme'
+        'Pixel Wonder',
+        'Shadows of the System',
+        'Eigengrau Light',
+        'Neon'
         // Add names corresponding to your tracks
       ];
       
@@ -124,48 +126,46 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     
     playTrack: function(trackIndex) {
-      if (trackIndex >= 0 && trackIndex < this.tracks.length) {
-        this.data.currentTrack = trackIndex;
-        
-        // Fade out current audio if playing
-        if (!this.audioElement.paused) {
-          this.fadeOut(() => {
+        if (trackIndex >= 0 && trackIndex < this.tracks.length) {
+          this.data.currentTrack = trackIndex;
+          
+          const changeAndPlay = () => {
             this.audioElement.src = this.tracks[trackIndex];
             this.audioElement.load();
-            this.fadeIn();
-          });
-        } else {
-          // Just start new track
-          this.audioElement.src = this.tracks[trackIndex];
-          this.audioElement.load();
+            const playPromise = this.audioElement.play();
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                this.fadeIn();
+                this.updateMusicButton(true);
+              }).catch(error => {
+                console.log('Playback prevented by browser', error);
+              });
+            }
+          };
           
-          const playPromise = this.audioElement.play();
-          
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
-              this.fadeIn();
-              this.updateMusicButton(true);
-            }).catch(error => {
-              console.log('Playback prevented by browser', error);
-              // Will be handled when user interacts
-            });
+          if (!this.audioElement.paused) {
+            this.fadeOut(changeAndPlay);
+          } else {
+            changeAndPlay();
           }
+          
+          this.showTrackNotification(this.trackNames[trackIndex] || `Track ${trackIndex + 1}`);
         }
-        
-        // Show track name notification
-        this.showTrackNotification(this.trackNames[trackIndex] || `Track ${trackIndex + 1}`);
-      }
-    },
+      },
     
     nextTrack: function() {
       const nextIndex = (this.data.currentTrack + 1) % this.tracks.length;
       this.playTrack(nextIndex);
+      // Added toggle call to start track.
+      //this.toggleMusic();
     },
     
     previousTrack: function() {
       let prevIndex = this.data.currentTrack - 1;
       if (prevIndex < 0) prevIndex = this.tracks.length - 1;
       this.playTrack(prevIndex);
+      // Added toggle call to start track.
+      //this.toggleMusic();
     },
     
     fadeIn: function() {
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (isPlaying) {
         this.musicButton.textContent = '🔊 Music: ON';
-        this.musicButton.style.backgroundColor = 'rgba(0, 170, 204, 0.7)';
+        this.musicButton.style.backgroundColor = 'rgba(2, 126, 150, 0.7)';
       } else {
         this.musicButton.textContent = '🔇 Music: OFF';
         this.musicButton.style.backgroundColor = 'rgba(100, 100, 100, 0.7)';
@@ -248,8 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       Object.assign(this.musicButton.style, {
         position: 'fixed',
-        bottom: '30px',
-        left: '30px',
+        bottom: '32px',
+        left: '10px',
         padding: '10px 15px',
         border: 'none',
         borderRadius: '20px',
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.assign(this.trackNotification.style, {
           position: 'fixed',
           bottom: '80px',
-          left: '30px',
+          left: '10px',
           padding: '8px 12px',
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
           color: 'white',

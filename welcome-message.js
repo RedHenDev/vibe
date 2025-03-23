@@ -5,7 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     AFRAME.registerComponent('welcome-message', {
       schema: {
-        title: { default: 'CLICK TO VIBE - Eigengrau Light v1.0' },
+        title: { default: 'Eigengrau Light v1.0' },
         duration: { type: 'number', default: 24000 }, // How long to show message (ms)
         mobileText: { type: 'string', default: 'swipe to turn • walk button to move' },
         desktopText: { type: 'string', default: 'SHIFT toggles run • SPACE for menu' },
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
         // Create dismiss hint
         const dismissHint = document.createElement('div');
-        dismissHint.textContent = 'Click message to dismiss';
+        dismissHint.textContent = 'CLICK TO START';
         Object.assign(dismissHint.style, {
           marginTop: '20px',
           fontSize: isMobile ? '14px' : '16px',

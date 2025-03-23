@@ -47,16 +47,17 @@ to do
 
 -i just one track for entire game (to keep lightweight). OK, maybe two -- since we have ambient and a lyrical.
 
--i ambient music track: is there a term for music that does not exhaust the ear, but whose melodies and other properties find themselves welcome and even addicting for the listener?
+DONE-i ambient music track: is there a term for music that does not exhaust the ear, but whose melodies and other properties find themselves welcome and even addicting for the listener?
+[Yes - fatigue.]
 
--refac adjust positions and possibly colours of ui buttons (music and menu) - i.e. out of way of and in line with other elements.
+DONE-refac adjust positions and possibly colours of ui buttons (music and menu) - i.e. out of way of and in line with other elements.
+
+-refac port music button to menu
 
 DONE-refac temporary 'fix' -- remove miniHud
 
 -refac remove micro-hud as visible in default. Perhaps 'port' to menu
 have commented out in a-loco.js. Also will comment out or hide in index.html
-
--refac port music button to menu
 
 -f metavibe portal
 

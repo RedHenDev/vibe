@@ -77,7 +77,7 @@ AFRAME.registerComponent('mobile-menu-button', {
         padding: padding,
         border: 'none',
         borderRadius: '30px',
-        backgroundColor: 'rgba(0, 170, 204, 0.7)',
+        backgroundColor: 'rgba(4, 132, 157, 0.7)',
         color: 'white',
         fontFamily: 'Arial, sans-serif',
         fontSize: fontSize,
@@ -88,16 +88,16 @@ AFRAME.registerComponent('mobile-menu-button', {
         cursor: 'pointer'
       });
       
-      // Position the button based on schema
+      // Position the button based on schema.
       switch (this.data.position) {
         case 'top-left':
-          this.menuButton.style.top = '30px';
-          this.menuButton.style.left = '30px';
+          this.menuButton.style.top = '10px';
+          this.menuButton.style.left = '10px';
           break;
         case 'top-right':
         default:
-          this.menuButton.style.top = '30px';
-          this.menuButton.style.right = '30px';
+          this.menuButton.style.top = '10px';
+          this.menuButton.style.right = '10px';
       }
     },
     

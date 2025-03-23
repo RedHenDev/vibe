@@ -65,7 +65,7 @@ AFRAME.registerSystem('npc-manager', {
           clampY: false,
           wiggle: false,
           flee: false,
-          spawnChance: 0.33 // 0% chance to spawn this type
+          spawnChance: 0 // 0% chance to spawn this type
         },
         'fleer': {
           model: '#mGlasst', // Same model but flees from player
