@@ -91,12 +91,12 @@ AFRAME.registerComponent('mobile-menu-button', {
       // Position the button based on schema.
       switch (this.data.position) {
         case 'top-left':
-          this.menuButton.style.top = '20px';
+          this.menuButton.style.top = '60px';
           this.menuButton.style.left = '10px';
           break;
         case 'top-right':
         default:
-          this.menuButton.style.top = '20px';
+          this.menuButton.style.top = '60px';
           this.menuButton.style.right = '10px';
       }
     },

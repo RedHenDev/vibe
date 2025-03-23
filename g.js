@@ -1,8 +1,8 @@
 // Game configuration.
 const config = {
     websocketUrl: 'wss://weeble-server.glitch.me/',
-    playerColors: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'cyan', 'magenta'],
-    playerModels: ['#mGlasst', '#mCublit'] // Available models for player avatars
+    playerColors: ['white', 'black'],
+    playerModels: ['#mCublit'] // Available models for player avatars
 };
 
 // Create a billboard component that makes entities always face the camera
