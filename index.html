@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Eigenlite Vibe 0.6</title>
+    <title>Eigengrau Vibe 0.7</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js"></script>
@@ -16,6 +16,12 @@
     <script src="free-controls.js"></script>
     <script src="game.js"></script>
     <script src="nimbus.js"></script>
+    <!-- <script src="tree-sys.js"></script> -->
+    <!-- <script src="grass-sys.js"></script> -->
+    <script src="perf-grass.js"></script>
+    <!-- <script src="model-sys.js"></script> -->
+    <script src="pyramid-scheme.js"></script>
+    <script src="vox.js"></script>
     
     <style>
         body {
@@ -70,6 +76,7 @@
     </style>
 </head>
 <body>
+    <a target="_blank" href="https://jam.pieter.com" style="font-family: 'system-ui', sans-serif; position: fixed; bottom: -1px; left: -1px; padding: 7px; font-size: 14px; font-weight: bold; background: #fff; color: #000; text-decoration: none; z-index: 10; border-top-left-radius: 12px; z-index: 10000; border: 1px solid #fff;">🕹️ Vibe Jam 2025</a>
     <div id="connection-status">Connection status: Disconnected</div>
     <div id="npc-stats">
         <div class="stat-row">
@@ -97,6 +104,8 @@
         <!-- Preload our assets. -->
         <a-asset-item id="mGlasst" src="./assets/glasst.glb"></a-asset-item>
         <a-asset-item id="mCublit" src="./assets/cublit.glb"></a-asset-item>
+        <a-asset-item id="mRocks" src="./assets/rocks.glb"></a-asset-item>
+    
     </a-assets>
 
         <!-- Player with terrain locomotion system -->
@@ -154,9 +163,7 @@
         <a-entity id="players"></a-entity>
         
         <!-- Terrain generation -->
-        <script src="grass-sys.js"></script>
         <a-entity terrain-generator></a-entity>
-        <a-entity grass-system></a-entity>
 
         <!-- Your original glasst NPC - can leave for reference -->
         <a-entity gltf-model="#mGlasst"

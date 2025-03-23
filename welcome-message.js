@@ -142,6 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Fade out
         element.style.opacity = '0';
+
+        // For enabling music and sounds.
+        document.dispatchEvent(new CustomEvent('welcome-dismissed'));
         
         // Remove after animation completes
         setTimeout(() => {
