@@ -27,7 +27,7 @@ CONTROLS:
 
 triage
 
-1- b-VR mode freezes when tilting right: refs commented out minihub?
+1- 
 
 2- sync behaviours and test terrain feature for multi-p
 
@@ -42,6 +42,8 @@ ad como key
 -refac = something to refactor
 
 to do
+
+DONE-bVR mode freezes when tilting right: refs commented out minihub?
 
 -i optimize more fully in anticipation of less capable machines
 
