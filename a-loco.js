@@ -8,6 +8,10 @@ AFRAME.registerComponent('terrain-movement', {
         this.velocity = new THREE.Vector3();
         this.targetY = 0;
 
+        // For updating hud location data message
+        // in tick function, if X and Z movement non-zero.
+        this.h = document.querySelector("#hud");
+
         // Experiment. Monty the armadillo.
         //this.monty=document.querySelector("#monty").object3D;
 
@@ -27,6 +31,7 @@ AFRAME.registerComponent('terrain-movement', {
         this.running=false;
         this.flying=false;
         this.hud=document.querySelector("#hud").object3D;
+        // NB not using for time being...
         this.minihud=document.querySelector("#micro-hud");
 
         // Luna bounce.
@@ -68,16 +73,29 @@ AFRAME.registerComponent('terrain-movement', {
         });
     },
 
+    // Updated hudToggle function to safely handle updating the HUD
+
     hudToggle: function(){
         this.hud.visible=!this.hud.visible;
-                if (this.hud.visible){
-                this.hud.position.y=2;
-                this.hud.rotation.y=this.cam.rotation.y;
-                this.minihud.visible=false;
+        
+        if (this.hud.visible){
+            const h = document.querySelector("#hud");
+            
+            // Add error handling when calling updateHud
+            if (h && typeof h.updateHud === 'function') {
+                try {
+                    h.updateHud();
+                } catch (err) {
+                    console.error("Error updating HUD:", err);
                 }
-                else {this.hud.position.y=999;
-                this.minihud.visible=false;
-                }
+            }
+            
+            this.hud.position.y=2;
+            this.hud.rotation.y=this.cam.rotation.y;
+        }
+        else {
+            this.hud.position.y=999;
+        }
     },
 
     tick: function(time, delta) {
@@ -206,6 +224,17 @@ document.querySelector('#micro-hud-text').setAttribute(
 
         // Apply movement in camera direction.
         if (this.moveX !== 0 || this.moveZ !== 0) {
+
+            // Update menu data on subject location.
+            // Add error handling when calling updateHud
+            if (this.h && typeof this.h.updateHud === 'function') {
+                try {
+                    this.h.updateHud();
+                } catch (err) {
+                    console.error("Error updating HUD:", err);
+                }
+            }
+
             const angle = rotation.y;
             
             if (this.running)

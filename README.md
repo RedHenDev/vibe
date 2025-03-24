@@ -12,7 +12,9 @@ Claude 3.7 (Anthropic) - coding
 Grok 3 beta (X) - coding
 MeshyAI - 3D modelling, textures, rigging
 Suno - music
-
+Glitch - backend
+VS-Code - IDE
+A-Frame (THREE.js under the hood) - VR and platform integration
 
 CONTROLS:
 - Click anywhere to enable mouse look
@@ -25,7 +27,7 @@ CONTROLS:
 
 triage
 
-1- avatars with nice models
+1- b-VR mode freezes when tilting right: refs commented out minihub?
 
 2- sync behaviours and test terrain feature for multi-p
 
@@ -40,6 +42,8 @@ ad como key
 -refac = something to refactor
 
 to do
+
+-i optimize more fully in anticipation of less capable machines
 
 -dev woods in only certain areas; option to decide manually as well as 'background' deployment of wooded areas from world seed.
 

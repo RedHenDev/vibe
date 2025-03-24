@@ -1,7 +1,8 @@
+// HUD_menu.js - Fixed version
+
 const hudParent = document.createElement('a-entity');
 hudParent.setAttribute('generate-hud', '');
 document.querySelector('a-scene').appendChild(hudParent);
-//document.querySelector('#player').appendChild(hudParent);
 
 AFRAME.registerComponent('generate-hud', {
   init: function() {
@@ -18,7 +19,7 @@ AFRAME.registerComponent('generate-hud', {
     panel.setAttribute('width', '4');
     panel.setAttribute('height', '2');
     panel.setAttribute('material', {
-      color: '#088',
+      color: '#048',
       opacity: 0.8,
       depthTest: true
     });
@@ -81,43 +82,22 @@ AFRAME.registerComponent('generate-hud', {
       tmc.lunaBounce = event.detail.state;
     });
 
-    /*
-    let button4;
-    if (worldSeed!=1){
-    button4 = createButton('b4', '-1 -0.6 0', 'snow', (event) => {
-      console.log('Button state:', event.detail.state);
-      const en = document.querySelector('#klaus').components['snow-system'];
-      en.data.snowing = event.detail.state;
-    });
-    }
-
-    // External, non-Hud button.
-    const button5 = createButton('b5', '0 0 0', 'snow', (event) => {
-      console.log('Button state:', event.detail.state);
-      const en = document.querySelector('#klaus').components['snow-system'];
-      en.data.snowing = event.detail.state;
-      // Remove button once activated. It worked!
-      sceneEl.remove(button5);
-    });
-    // Place button out in world, not on Hud. Note lower we append
-    // to scene and not Hud.
-    //button5.setAttribute('position', "440 12 -365");
-    button5.setAttribute('position', "94 6 -1044");
-    button5.setAttribute('buttonText', 'position', '0 0 0.01');
-    button5.setAttribute('scale', "12 12 12");
-    button5.setAttribute('look-at','targetID:#player;rSpeed:1');
-    */
+    // Attempt to add player position to main Hud menu.
+    // Create location text
+    const locationText = document.createElement('a-text');
+    const position = playerEl.object3D.position;
+    locationText.setAttribute('id', 'hud-loco-text');
+    locationText.setAttribute('value', `X ${Math.floor(position.x)} Y ${Math.floor(position.y)} Z ${Math.floor(position.z)} | PC: 1`);
+    locationText.setAttribute('position', '-1 -0.75 0.01');
+    locationText.setAttribute('scale', '0.6 0.6 0.6');
+    locationText.setAttribute('align', 'center');
+    locationText.setAttribute('color', '#EEE');
+    panel.appendChild(locationText);
 
     // Add buttons to panel.
     panel.appendChild(button1);
     panel.appendChild(button2);
     panel.appendChild(button3);
-    /*
-    if (worldSeed!=1){
-    panel.appendChild(button4);
-    }
-    sceneEl.appendChild(button5);
-    */
 
     // Add panel to HUD.
     hudEntity.appendChild(panel);
@@ -125,11 +105,28 @@ AFRAME.registerComponent('generate-hud', {
     // Add HUD to scene.
     //sceneEl.appendChild(hudEntity);
     playerEl.appendChild(hudEntity);
+    
     // Begin hidden.
     hudEntity.object3D.visible=false;
     hudEntity.object3D.position.y=999;
+    
+    // KEY FIX: Add the updateHud method directly to the HUD entity
+    hudEntity.updateHud = function() {
+      try {
+        const playerEl = document.querySelector('#player');
+        if (!playerEl || !playerEl.object3D) return;
+        
+        const position = playerEl.object3D.position;
+        const locationText = this.querySelector('#hud-loco-text');
+        if (!locationText) return;
+        
+        const playerCount = window.playerCount || 1;
+        locationText.setAttribute('value', `X ${Math.floor(position.x)} Y ${Math.floor(position.y)} Z ${Math.floor(position.z)} | PC: ${playerCount}`);
+      } catch (err) {
+        console.error("Error updating HUD:", err);
+      }
+    };
   }
-
 });
 
 // Component to handle button states.
