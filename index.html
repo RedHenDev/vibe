@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Eigengrau Light 0.9</title>
+    <title>Eigengrau Light v0.91</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
-    <script src="urizen.js"></script>
+    <script src="urizen.js" data-seed="1"></script>
     <script src="fps-counter.js"></script>
     <!-- Enhanced AI system -->
     <script src="ai_sys.js"></script>
@@ -13,6 +13,8 @@
     <!-- NPC Manager -->
     <script src="npc-manager.js"></script>
     <!-- Here goes... -->
+    <script src="vibes.js"></script>
+    <script src="vibes-manager.js"></script>
     <!-- <script src="collectibles-system.js"></script> -->
     <!-- <script src="deep-collects.js"></script> -->
     <!-- Pointer lock controls for free look -->
@@ -107,7 +109,7 @@
         <!-- Preload our assets. -->
         <a-asset-item id="mGlasst" src="./assets/glasst.glb"></a-asset-item>
         <a-asset-item id="mCublit" src="./assets/cublit.glb"></a-asset-item>
-        <a-asset-item id="mRocks" src="./assets/rocks.glb"></a-asset-item>
+        <!-- <a-asset-item id="mRocks" src="./assets/rocks.glb"></a-asset-item> -->
     
     </a-assets>
 
@@ -159,7 +161,7 @@
                     distance: 0;
                     decay: 0;
                     castShadow: true"
-                position="0 164 0">
+                position="0 264 0">
             </a-entity>
         </a-entity>
         
@@ -185,8 +187,8 @@
         <a-entity 
             id="npc-manager-entity" 
             npc-manager="
-            maxNPCs: 4;
-            poolSize: 8;">
+            maxNPCs: 5;
+            poolSize: 10;">
         </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->
@@ -267,6 +269,6 @@
     </script>
     <script src="welcome-message.js"></script>
     <script src="menu-button.js"></script>
-    
+    <script src="performance-upgrade.js"></script>
 </body>
 </html>

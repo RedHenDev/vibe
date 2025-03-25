@@ -15,6 +15,7 @@ Suno - music
 Glitch - backend
 VS-Code - IDE
 A-Frame (THREE.js under the hood) - VR and platform integration
+[to complete] shoot_01.mp3 - 
 
 CONTROLS:
 - Click anywhere to enable mouse look
@@ -27,11 +28,11 @@ CONTROLS:
 
 triage
 
-1- 
+1- simplified collectibles (plus sounds/textures)
 
-2- sync behaviours and test terrain feature for multi-p
+2- performance version of terrain (if time, pooling of terrain chunks, cf. NPCs)
 
-3- collectibles system (that can lift from different kinds of script, e.g. where pyramids might supply its items, but in other script where I might manually place things, or where NPCs have dropped them)
+3- portal
 
 ad como key
 
