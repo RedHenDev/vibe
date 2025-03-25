@@ -11,7 +11,7 @@
     enableWorkerTerrain: true,      // Use web worker for terrain calculations
     enableShaderOptimizations: true, // Use optimized shaders
     monitorPerformance: false,       // Add performance monitoring
-    adaptToDeviceCapability: true,  // Automatically adjust settings based on device performance
+    adaptToDeviceCapability: false,  // Automatically adjust settings based on device performance
     showDebugInfo: false            // Show debug information
   };
   

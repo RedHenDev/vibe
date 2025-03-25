@@ -16,10 +16,10 @@ AFRAME.registerComponent('tree-system', {
     schema: {
         chunkSize: { type: 'number', default: 64 },           // Size of each chunk in meters
         renderDistance: { type: 'number', default: 128 },     // Max distance to render grass
-        instancesPerChunk: { type: 'number', default: 12 }, // Grass blades per chunk
+        instancesPerChunk: { type: 'number', default: 4 }, // Grass blades per chunk
         updateThreshold: { type: 'number', default: 32 },     // Distance player must move to trigger update
-        minHeight: { type: 'number', default: 4 },          // Minimum grass height
-        maxHeight: { type: 'number', default: 8 },          // Maximum grass height
+        minHeight: { type: 'number', default: 42 },          // Minimum grass height
+        maxHeight: { type: 'number', default: 88 },          // Maximum grass height
         baseColor: { type: 'color', default: '#FFF' },     // Base grass color
         chunksPerFrame: { type: 'number', default: 2 },       // Chunks to generate per frame
         colorVariation: { type: 'number', default: 0.2 },     // Color variation amount (0-1)
