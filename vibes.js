@@ -1,8 +1,8 @@
 // Simple collectibles system for Eigengrau Light
 // Defines two collectible types: vibe and karpathy crystal
 
-// Define collectible types
-const COLLECTIBLE_TYPES = {
+// Define collectible types and make them globally accessible
+window.COLLECTIBLE_TYPES = {
     "vibe": {
       shape: "sphere",
       color: "#00DDFF",
@@ -13,10 +13,10 @@ const COLLECTIBLE_TYPES = {
     },
     "karpathy": {
       shape: "diamond",
-      color: "#00DDFF",
-      scale: "5 5 5",
+      color: "#FFF",
+      scale: "3 3 3",
       glow: false,
-      points: 0,
+      points: 2, // Updated from 0 to 5 to match vibes-manager.js
       soundEffect: "./assets/Pickup_03.mp3" // Using the same sound for both types
     }
   };
@@ -31,7 +31,7 @@ const COLLECTIBLE_TYPES = {
   
     init: function() {
       // Get configuration for this collectible type
-      const typeConfig = COLLECTIBLE_TYPES[this.data.type];
+      const typeConfig = window.COLLECTIBLE_TYPES[this.data.type];
       if (!typeConfig) {
         console.error(`Unknown collectible type: ${this.data.type}`);
         return;
@@ -155,7 +155,7 @@ const COLLECTIBLE_TYPES = {
           this.el.setAttribute('geometry', {
             primitive: 'sphere',
             radius: 0.5,
-            segmentsWidth: 4,  // Already low-poly
+            segmentsWidth: 6,  // Already low-poly
             segmentsHeight: 2
           });
           break;
@@ -164,10 +164,6 @@ const COLLECTIBLE_TYPES = {
       // Set material with glow but more performant settings
       this.el.setAttribute('material', {
         color: typeConfig.color,
-        metalness: 0.3,
-        roughness: 0.3,
-        emissive: typeConfig.glow ? typeConfig.color : '#000000',
-        emissiveIntensity: typeConfig.glow ? 0.7 : 0,
         shader: 'flat',
         wireframe: false,  // Solid rendering
         wireframeLinewidth: 2  // Thicker lines make it more visible
@@ -186,26 +182,22 @@ const COLLECTIBLE_TYPES = {
       });
       
       // Simple outline using a border material property instead of an extra mesh
-      this.el.setAttribute('material', {
-        color: typeConfig.color,
-        metalness: 0.3,
-        roughness: 0.3,
-        emissive: typeConfig.glow ? typeConfig.color : '#000000',
-        emissiveIntensity: typeConfig.glow ? 0.7 : 0,
-        shader: 'flat'
-      });
+    //   this.el.setAttribute('material', {
+    //     color: 'black',
+    //     shader: 'flat'
+    //   });
     },
     
     addGlowEffect: function(color) {
       // Add a light to create glow effect
-      const light = document.createElement('a-entity');
-      light.setAttribute('light', {
-        type: 'point',
-        color: color,
-        intensity: 0.5,
-        distance: 5
-      });
-      this.el.appendChild(light);
+    //   const light = document.createElement('a-entity');
+    //   light.setAttribute('light', {
+    //     type: 'point',
+    //     color: color,
+    //     intensity: 0.5,
+    //     distance: 5
+    //   });
+    //   this.el.appendChild(light);
     },
     
     applyKarpathyEffect: function() {
@@ -218,11 +210,11 @@ const COLLECTIBLE_TYPES = {
         terrainMovement.flying = true;
         
         // Initial small boost for immediate feedback
-        playerEl.object3D.position.y += 5;
+        //playerEl.object3D.position.y += 5;
         
         // Create a smooth acceleration effect over 2 seconds
         let accelerationTime = 0;
-        const totalAccelerationTime = 2000; // 2 seconds
+        const totalAccelerationTime = 4000; // 2 seconds
         const accelerationInterval = 50; // Update every 50ms
         const totalSteps = totalAccelerationTime / accelerationInterval;
         let currentStep = 0;

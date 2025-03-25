@@ -66,7 +66,7 @@ AFRAME.registerSystem('npc-manager', {
           clampY: false,
           wiggle: false,
           flee: false,
-          spawnChance: 0 // 0% chance to spawn this type
+          spawnChance: 0.10 // 0% chance to spawn this type
         },
         'fleer': {
           model: '#mGlasst', // Same model but flees from player
@@ -79,7 +79,18 @@ AFRAME.registerSystem('npc-manager', {
           wiggle: true,
           flee: false,
           spawnChance: 0.33 // 0% chance to spawn this type
-        }
+        },
+        'shelby': {
+            model: '#mShelby', // Different model!
+            scale: '4 4 4',
+            height: 2,
+            speed: 0.5,
+            rSpeed: 1.2,
+            clampY: true,
+            wiggle: true,
+            flee: false,
+            spawnChance: 0.8 // 0% chance to spawn this type
+          }
       };
     },
     

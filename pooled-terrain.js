@@ -19,7 +19,7 @@ AFRAME.registerComponent('pooled-terrain-generator', {
   schema: {
     chunkSize: { type: 'number', default: 64 },           // Size of each chunk in meters
     poolSize: { type: 'number', default: 36 },            // Number of chunks to pre-allocate in the pool
-    chunksToRender: { type: 'number', default: 9 },       // Number of chunks to render around player (3x3 grid)
+    chunksToRender: { type: 'number', default: 25 },       // Number of chunks to render around player (3x3 grid)
     updateThreshold: { type: 'number', default: 32 },     // Distance player must move to trigger update
     resolution: { type: 'number', default: 1 }            // Terrain resolution (higher = more detail but slower)
   },

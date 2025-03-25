@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
       enabled: { default: true },
       // Cloud distribution
       totalClouds: { type: 'number', default: 32 }, // Total cloud instances
-      skyRadius: { type: 'number', default: 800 },
+      skyRadius: { type: 'number', default: 420 },
       cloudBaseHeight: { type: 'number', default: 170 },
       heightRange: { type: 'number', default: 50 },
       // Visual properties
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
       useInstancing: { type: 'boolean', default: true },
       useBillboards: { type: 'boolean', default: false },
       maxVisibleDistance: { type: 'number', default: 600 },
-      updateFrequency: { type: 'number', default: 2 } // Update every N frames
+      updateFrequency: { type: 'number', default: 4 } // Update every N frames
     },
   
     init: function() {
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Create a material with custom shader for soft edges
       const cloudMaterial = new THREE.MeshStandardMaterial({
         color: this.data.cloudColor,
-        transparent: false,
+        transparent: true,
         opacity: 0.7,
         roughness: 0.8,
         metalness: 0.1,

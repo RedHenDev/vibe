@@ -133,7 +133,7 @@ AFRAME.registerSystem('collectible-manager', {
     
     for (let i = 0; i < actualSpawn; i++) {
       // Mostly spawn vibes, occasionally karpathy crystals
-      const type = Math.random() > 0.6 ? 'karpathy' : 'vibe';
+      const type = Math.random() > 0.7 ? 'karpathy' : 'vibe';
       this.spawnCollectible(type);
     }
   },
@@ -200,7 +200,7 @@ AFRAME.registerSystem('collectible-manager', {
     }
     
     // Add vertical offset to ensure visibility
-    return { x, y: y + 4, z };
+    return { x, y: y + 4 + Math.random() * 4, z };
   },
   
   cleanupDistantCollectibles: function() {
@@ -256,17 +256,31 @@ AFRAME.registerSystem('collectible-manager', {
     }
   },
   
+  // This is just the updated recordCollection function
   recordCollection: function(type) {
     // Update stats
     this.stats.collected++;
     
+    // Get points from COLLECTIBLE_TYPES if available, otherwise use fallback values
+    let points = 1; // Default fallback for vibe
     if (type === 'vibe') {
       this.stats.vibes++;
-      this.stats.points += 1;
+      // Try to get points from COLLECTIBLE_TYPES
+      if (window.COLLECTIBLE_TYPES && window.COLLECTIBLE_TYPES.vibe) {
+        points = window.COLLECTIBLE_TYPES.vibe.points;
+      }
     } else if (type === 'karpathy') {
       this.stats.karpathys++;
-      this.stats.points += 5;
+      // Try to get points from COLLECTIBLE_TYPES
+      if (window.COLLECTIBLE_TYPES && window.COLLECTIBLE_TYPES.karpathy) {
+        points = window.COLLECTIBLE_TYPES.karpathy.points;
+      } else {
+        points = 2; // Fallback value
+      }
     }
+    
+    // Add points to total
+    this.stats.points += points;
     
     // Update HUD
     this.updateHud();
@@ -278,7 +292,7 @@ AFRAME.registerSystem('collectible-manager', {
     // Find HUD text element
     const hudText = document.querySelector('#collectibles-hud-text');
     if (hudText) {
-      hudText.setAttribute('value', `vibes: ${this.stats.points}`);
+      hudText.setAttribute('value', `vibes ${this.stats.points}`);
     }
   },
   
@@ -337,12 +351,12 @@ AFRAME.registerComponent('collectibles-hud', {
     // Text display
     const hudText = document.createElement('a-text');
     hudText.setAttribute('id', 'collectibles-hud-text');
-    hudText.setAttribute('value', 'vibes: 0');
+    hudText.setAttribute('value', 'vibes 0');
     hudText.setAttribute('align', 'center');
     hudText.setAttribute('color', 'white');
-    hudText.setAttribute('width', 2);
+    hudText.setAttribute('width', 1.8);
     hudText.setAttribute('style', 'bold');
-    hudText.setAttribute('position', '0 0 0.01');
+    hudText.setAttribute('position', '0 0.02 0.01');
     hudEntity.appendChild(hudText);
     
     // Add to camera
@@ -356,7 +370,7 @@ AFRAME.registerSystem('collectible-sync', {
     this.collectibles = new Map();
     this.pendingUpdates = [];
     this.lastSyncTime = 0;
-    this.syncInterval = 1000;
+    this.syncInterval = 2000;
     
     // Connect to WebSocket if available
     this.connectToWebSocket();
