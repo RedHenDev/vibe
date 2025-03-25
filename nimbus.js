@@ -18,10 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     schema: {
       enabled: { default: true },
       // Cloud distribution
-      totalClouds: { type: 'number', default: 64 }, // Total cloud instances
-      skyRadius: { type: 'number', default: 400 },
-      cloudBaseHeight: { type: 'number', default: 100 },
-      heightRange: { type: 'number', default: 70 },
+      totalClouds: { type: 'number', default: 32 }, // Total cloud instances
+      skyRadius: { type: 'number', default: 800 },
+      cloudBaseHeight: { type: 'number', default: 170 },
+      heightRange: { type: 'number', default: 50 },
       // Visual properties
       cloudColor: { type: 'color', default: '#FFFFFF' },
       // Optimization settings
@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Create a material with custom shader for soft edges
       const cloudMaterial = new THREE.MeshStandardMaterial({
         color: this.data.cloudColor,
-        transparent: true,
+        transparent: false,
         opacity: 0.7,
         roughness: 0.8,
         metalness: 0.1,
-        flatShading: false
+        flatShading: true
       });
       
       // Create instanced mesh for small clouds (more numerous, smaller)

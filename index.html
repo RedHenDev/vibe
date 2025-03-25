@@ -13,7 +13,8 @@
     <!-- NPC Manager -->
     <script src="npc-manager.js"></script>
     <!-- Here goes... -->
-    <script src="collectibles-system.js"></script>
+    <!-- <script src="collectibles-system.js"></script> -->
+    <!-- <script src="deep-collects.js"></script> -->
     <!-- Pointer lock controls for free look -->
     <script src="free-controls.js"></script>
     <script src="game.js"></script>
@@ -22,7 +23,7 @@
     <!-- <script src="grass-sys.js"></script> -->
     <script src="perf-grass.js"></script>
     <!-- <script src="model-sys.js"></script> -->
-    <script src="pyramid-scheme.js"></script>
+    <!-- <script src="pyramid-scheme.js"></script> -->
     <script src="vox.js"></script>
     
     <style>
@@ -152,7 +153,7 @@
             
             <!-- Light source -->
             <a-entity
-                light="type: point;
+                light="type: directional;
                     color: #FFEEDD;
                     intensity: 6.0;
                     distance: 0;
@@ -169,13 +170,13 @@
         <a-entity terrain-generator></a-entity>
 
         <!-- Your original glasst NPC - can leave for reference -->
-        <a-entity gltf-model="#mGlasst"
+        <!-- <a-entity gltf-model="#mGlasst"
             id="glasst"
             scale="8 8 8"     
             position="123 16 -20"
             ai-loco-legacy="height:12;speed:0.7;targetID:#player;
             rSpeed:0.9;clampY:false" 
-        ></a-entity>
+        ></a-entity> -->
         
         <!-- NPC container, managed by NPC Manager -->
         <a-entity id="npcs"></a-entity>
@@ -184,8 +185,8 @@
         <a-entity 
             id="npc-manager-entity" 
             npc-manager="
-            maxNPCs: 12;
-            poolSize: 32;">
+            maxNPCs: 4;
+            poolSize: 8;">
         </a-entity>
         
         <!-- HUD for displaying info (needed by a-loco.js) -->

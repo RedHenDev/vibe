@@ -18,11 +18,12 @@ AFRAME.registerComponent('grass-system', {
     schema: {
       chunkSize: { type: 'number', default: 64 },           // Size of each chunk in meters
       renderDistance: { type: 'number', default: 128 },      // Max distance to render grass
-      instancesPerChunk: { type: 'number', default: 3000 },  // Grass blades per chunk
+      instancesPerChunk: { type: 'number', default: 6000 },  // Grass blades per chunk
       updateThreshold: { type: 'number', default: 32 },      // Distance player must move to trigger update
       minHeight: { type: 'number', default: 1.0 },           // Minimum grass height
       maxHeight: { type: 'number', default: 2.5 },           // Maximum grass height
-      baseColor: { type: 'color', default: '#16161D' },      // Base grass color
+      //baseColor: { type: 'color', default: '#16161D' },      // Base grass color
+      baseColor: { type: 'color', default: '#00D200' },
       chunksPerFrame: { type: 'number', default: 2 },        // Chunks to generate per frame
       colorVariation: { type: 'number', default: 0.2 }       // Color variation amount (0-1)
     },
@@ -39,7 +40,7 @@ AFRAME.registerComponent('grass-system', {
       this.isProcessingQueue = false;
       
       // Define grass blade geometry and material
-      this.geometry = new THREE.PlaneGeometry(0.2, 1.0); // Width and unit height (will be scaled)
+      this.geometry = new THREE.PlaneGeometry(0.2, 2.0); // Width and unit height (will be scaled)
       this.material = new THREE.MeshBasicMaterial({
         color: this.data.baseColor,
         side: THREE.DoubleSide

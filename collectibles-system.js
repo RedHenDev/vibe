@@ -19,17 +19,17 @@ const COLLECTIBLE_TYPES = {
       type: "procedural",
       shape: "diamond",
       color: "#00DDFF",
-      scale: "1.5 1.5 1.5",
+      scale: "15 15 15",
       glow: true,
       rotate: true,
       effect: "special",
       effectDuration: 5,
-      spawnRate: 1,
+      spawnRate: 10,
       points: 10
     },
     "crystal": {
-      type: "model",
-      model: "#mGlasst",
+        type: "procedural",
+        shape: "torus",
       scale: "3 3 3",
       color: "#AA00FF",
       rotate: true,
@@ -39,8 +39,8 @@ const COLLECTIBLE_TYPES = {
       points: 5
     },
     "cubelit": {
-      type: "model",
-      model: "#mCublit",
+        type: "procedural",
+        shape: "torus",
       scale: "5 5 5",
       color: "#00FF88",
       rotate: true,
@@ -171,7 +171,7 @@ const COLLECTIBLE_TYPES = {
       if (this.data.collectedBy) return;
   
       if (this.playerEl && this.isPlayerInRange()) {
-        console.log('Collecting item:', this.data.type);
+        //console.log('Collecting item:', this.data.type);
         this.collectItem();
       }
     },
@@ -186,17 +186,17 @@ const COLLECTIBLE_TYPES = {
       const distSquared = dx * dx + dy * dy + dz * dz;
       const radiusSquared = this.collectionRadius * this.collectionRadius;
   
-      if (Math.random() < 0.01) {
-        console.log('Distance to collectible:', Math.sqrt(distSquared).toFixed(2),
-                    'Collection radius:', this.collectionRadius);
-      }
+      //if (Math.random() < 0.01) {
+        //console.log('Distance to collectible:', Math.sqrt(distSquared).toFixed(2),
+        //            'Collection radius:', this.collectionRadius);
+      //}
   
       return distSquared < radiusSquared;
     },
   
     collectItem: function() {
       const playerId = window.playerId || 'local-player';
-      console.log('Collecting item with player ID:', playerId);
+      //console.log('Collecting item with player ID:', playerId);
   
       this.data.collectedBy = playerId;
   
@@ -677,7 +677,7 @@ const COLLECTIBLE_TYPES = {
       const typeConfig = COLLECTIBLE_TYPES[collectibleType];
       if (!typeConfig) return;
   
-      console.log(`Recording collection of ${collectibleType}`);
+      //console.log(`Recording collection of ${collectibleType}`);
   
       this.playerStats.collected++;
       this.playerStats.points += typeConfig.points || 1;
@@ -689,7 +689,7 @@ const COLLECTIBLE_TYPES = {
   
       this.updateStatsDisplay();
   
-      const message = `+${typeConfig.points || 1} points!`;
+      const message = `+${typeConfig.points || 1} vibes!`;
       createVRNotification(message, 1500);
   
       return this.playerStats;
@@ -698,8 +698,10 @@ const COLLECTIBLE_TYPES = {
     updateStatsDisplay: function() {
       const hudText = document.querySelector('#collectibles-hud-text');
       if (hudText) {
-        hudText.setAttribute('value', `Items: ${this.playerStats.collected} | Points: ${this.playerStats.points}`);
-        console.log(`Updated HUD stats: Items: ${this.playerStats.collected}, Points: ${this.playerStats.points}`);
+        //hudText.setAttribute('value', `vibes: ${this.playerStats.collected} | Points: ${this.playerStats.points}`);
+        hudText.setAttribute('value', `vibes collected: ${this.playerStats.points}`);
+        
+        //console.log(`Updated HUD stats: Items: ${this.playerStats.collected}, Points: ${this.playerStats.points}`);
   
         if (this.playerStats.collected > 9 || this.playerStats.points > 99) {
           const panel = hudText.parentNode.querySelector('[geometry]');
@@ -860,7 +862,7 @@ const COLLECTIBLE_TYPES = {
     schema: {
       enabled: { default: true },
       spawnRadius: { type: 'number', default: 100 },
-      maxCollectibles: { type: 'number', default: 20 },
+      maxCollectibles: { type: 'number', default: 7 },
       spawnInterval: { type: 'number', default: 10000 },
       chunkSize: { type: 'number', default: 64 },
       renderDistance: { type: 'number', default: 128 }
@@ -883,6 +885,8 @@ const COLLECTIBLE_TYPES = {
   
       this.setupSync();
   
+      /*
+      // For testing.
       setTimeout(() => {
         console.log('Spawning initial collectibles very close to player');
         const playerPos = this.player.position;
@@ -906,6 +910,7 @@ const COLLECTIBLE_TYPES = {
       }, 5000);
   
       console.log('Collectible manager initialized, will spawn test items in 5 seconds');
+      */
     },
   
     setupSync: function() {
@@ -1002,7 +1007,7 @@ const COLLECTIBLE_TYPES = {
       try {
         if (typeof getTerrainHeight === 'function') {
           y = getTerrainHeight(x, z);
-          console.log('Spawning collectible at height:', y);
+          //console.log('Spawning collectible at height:', y);
         } else {
           console.warn('getTerrainHeight not found, using default height');
           y = playerPos.y;
@@ -1106,7 +1111,7 @@ const COLLECTIBLE_TYPES = {
       const typeConfig = COLLECTIBLE_TYPES[collectibleType];
       if (!typeConfig) return;
   
-      console.log(`Recording collection of ${collectibleType}`);
+      //console.log(`Recording collection of ${collectibleType}`);
   
       this.playerStats.collected++;
       this.playerStats.points += typeConfig.points || 1;
@@ -1118,7 +1123,7 @@ const COLLECTIBLE_TYPES = {
   
       this.updateStatsDisplay();
   
-      const message = `+${typeConfig.points || 1} points!`;
+      const message = `+${typeConfig.points || 1} vibes!`;
       createVRNotification(message, 1500);
   
       return this.playerStats;
@@ -1127,8 +1132,8 @@ const COLLECTIBLE_TYPES = {
     updateStatsDisplay: function() {
       const hudText = document.querySelector('#collectibles-hud-text');
       if (hudText) {
-        hudText.setAttribute('value', `Items: ${this.playerStats.collected} | Points: ${this.playerStats.points}`);
-        console.log(`Updated HUD stats: Items: ${this.playerStats.collected}, Points: ${this.playerStats.points}`);
+        hudText.setAttribute('value', `vibes collected: ${this.playerStats.points}`);
+        //console.log(`Updated HUD stats: Items: ${this.playerStats.collected}, Points: ${this.playerStats.points}`);
   
         if (this.playerStats.collected > 9 || this.playerStats.points > 99) {
           const panel = hudText.parentNode.querySelector('[geometry]');
@@ -1163,7 +1168,7 @@ const COLLECTIBLE_TYPES = {
   
       const hudText = document.createElement('a-text');
       hudText.setAttribute('id', 'collectibles-hud-text');
-      hudText.setAttribute('value', 'Items: 0 | Points: 0');
+      hudText.setAttribute('value', 'collect vibes...');
       hudText.setAttribute('align', 'center');
       hudText.setAttribute('color', 'white');
       hudText.setAttribute('scale', textScale);

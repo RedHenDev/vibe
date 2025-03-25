@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileText: { type: 'string', default: 'swipe to turn • walk button to move' },
         desktopText: { type: 'string', default: 'SHIFT toggles run • SPACE for menu' },
         vrText: { type: 'string', default: 'Tilt head left toggles walk • Tilt head right toggles menu' },
-        goalText: { type: 'string', default: 'Navigate this infinite world • Find other players • Beware the night!' }
+        goalText: { type: 'string', default: 'Navigate this infinite world • Collect vibes • Beware the night!' }
       },
   
       init: function() {
