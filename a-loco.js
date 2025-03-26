@@ -197,7 +197,7 @@ document.querySelector('#micro-hud-text').setAttribute(
             let sTime = Date.now();
             if (sTime-this.timeStamp > 500){
                 if (this.keys.ShiftLeft) {
-                    this.running=!this.running;
+                    //this.running=!this.running;
                     this.timeStamp=Date.now();
                 }
             }

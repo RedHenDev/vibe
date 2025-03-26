@@ -133,7 +133,12 @@ AFRAME.registerSystem('collectible-manager', {
     
     for (let i = 0; i < actualSpawn; i++) {
       // Mostly spawn vibes, occasionally karpathy crystals
-      const type = Math.random() > 0.7 ? 'karpathy' : 'vibe';
+      //const type = Math.random() > 0.7 ? 'karpathy' : 'vibe';
+      let type;
+      const whatPickup = Math.random();
+      if (whatPickup < 0.2) type = 'karpathy';
+      else if (whatPickup < 0.5) type = 'ring';
+      else type = 'vibe';
       this.spawnCollectible(type);
     }
   },

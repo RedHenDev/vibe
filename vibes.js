@@ -11,6 +11,14 @@ window.COLLECTIBLE_TYPES = {
       points: 1,
       soundEffect: "./assets/Shoot_01.mp3" // Using the provided sound file
     },
+    "ring": {
+      shape: "torus",
+      color: "#FFFF00",
+      scale: "2 2 2",
+      glow: false,
+      points: 1,
+      soundEffect: "./assets/sonic-coin-sound.mp3" // Using the provided sound file
+    },
     "karpathy": {
       shape: "diamond",
       color: "#FFF",
@@ -73,6 +81,8 @@ window.COLLECTIBLE_TYPES = {
         
         // Skip if already collected
         if (this.data.collectedBy) return;
+
+        //this.el.object3D.position.y += Math.sin(Date.now()) * 1;
         
         // Check for collection
         if (this.playerEl && this.isPlayerInRange()) {
@@ -121,6 +131,9 @@ window.COLLECTIBLE_TYPES = {
       if (this.data.type === 'karpathy') {
         this.applyKarpathyEffect();
       }
+      else if (this.data.type === 'ring') {
+        this.applySonicEffect();
+      }
       
       // Record collection in the manager system
       if (window.collectiblesManager) {
@@ -159,14 +172,22 @@ window.COLLECTIBLE_TYPES = {
             segmentsHeight: 2
           });
           break;
+          case 'torus':
+          this.el.setAttribute('geometry', {
+            primitive: 'torus',
+            radius: 1.2,
+            segmentsWidth: 3,  // Already low-poly
+            segmentsHeight: 3
+          });
+          break;
       }
       
       // Set material with glow but more performant settings
       this.el.setAttribute('material', {
         color: typeConfig.color,
         shader: 'flat',
-        wireframe: false,  // Solid rendering
-        wireframeLinewidth: 2  // Thicker lines make it more visible
+        wireframe: true,  // Solid rendering
+        wireframeLinewidth: 4  // Thicker lines make it more visible
       });
       
       // Apply scale
@@ -181,11 +202,6 @@ window.COLLECTIBLE_TYPES = {
         to: 360
       });
       
-      // Simple outline using a border material property instead of an extra mesh
-    //   this.el.setAttribute('material', {
-    //     color: 'black',
-    //     shader: 'flat'
-    //   });
     },
     
     addGlowEffect: function(color) {
@@ -199,6 +215,20 @@ window.COLLECTIBLE_TYPES = {
     //   });
     //   this.el.appendChild(light);
     },
+
+    applySonicEffect: function() {
+        // Find player's terrain-movement component
+        const playerEl = document.querySelector('#player');
+        const terrainMovement = playerEl.components['terrain-movement'];
+        
+        if (terrainMovement) {
+          // Enable flight mode
+          terrainMovement.running = true;
+        }
+        setTimeout(() => {
+            terrainMovement.running = false;
+          }, 15000);
+    },
     
     applyKarpathyEffect: function() {
       // Find player's terrain-movement component
@@ -208,10 +238,10 @@ window.COLLECTIBLE_TYPES = {
       if (terrainMovement) {
         // Enable flight mode
         terrainMovement.flying = true;
-        
+        playerEl.object3D.position.y += 12;
         // Initial small boost for immediate feedback
         //playerEl.object3D.position.y += 5;
-        
+        /*
         // Create a smooth acceleration effect over 2 seconds
         let accelerationTime = 0;
         const totalAccelerationTime = 4000; // 2 seconds
@@ -236,25 +266,25 @@ window.COLLECTIBLE_TYPES = {
           // Clear interval after acceleration phase
           if (currentStep >= totalSteps) {
             clearInterval(accelerationIntervalId);
-            console.log("Karpathy acceleration complete, continuing flight mode");
+            //console.log("Karpathy acceleration complete, continuing flight mode");
           }
         }, accelerationInterval);
         
         // Set moveZ positive to ensure upward movement when flying
-        terrainMovement.moveZ = 1;
-        
+        //terrainMovement.moveZ = 1;
+        */
         // Disable flight and reset moveZ after 15 seconds
         setTimeout(() => {
           terrainMovement.flying = false;
           // Don't reset moveZ if player is actively moving
-          if (!terrainMovement.keys || (!terrainMovement.keys.w && !terrainMovement.keys.ArrowUp)) {
-            terrainMovement.moveZ = 0;
-          }
+        //   if (!terrainMovement.keys || (!terrainMovement.keys.w && !terrainMovement.keys.ArrowUp)) {
+        //     terrainMovement.moveZ = 0;
+        //   }
         }, 15000);
         
-        console.log("🚀 Karpathy effect applied - launching player with smooth acceleration!");
+        //console.log("🚀 Karpathy effect applied - launching player with smooth acceleration!");
       } else {
-        console.warn("Could not find terrain-movement component on player");
+        //console.warn("Could not find terrain-movement component on player");
       }
     },
     

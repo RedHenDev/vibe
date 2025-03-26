@@ -48,7 +48,7 @@ const mathConcepts = [
 // Game state
 let socket;
 let playerId;
-let playerName; // Store our player's name
+window.playerName; // Store our player's name
 let remotePlayers = {};
 
 // Make player count globally accessible for a-loco.js

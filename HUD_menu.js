@@ -28,16 +28,17 @@ AFRAME.registerComponent('generate-hud', {
     const titleText = document.createElement('a-text');
     titleText.setAttribute('id', 'hud-text');
     titleText.setAttribute('value', 'menu');
-    titleText.setAttribute('position', '0 0.75 0.01');
+    titleText.setAttribute('position', '0 0.25 1.3');
     titleText.setAttribute('scale', '1 1 1');
     titleText.setAttribute('align', 'center');
-    titleText.setAttribute('color', '#DDD');
+    titleText.setAttribute('color', '#0ED');
     panel.appendChild(titleText);
 
     // Function to create buttons
     const createButton = (id, position, textValue, handler) => {
       const button = document.createElement('a-box');
       button.setAttribute('id', id);
+      button.setAttribute('material','shader','flat');
       button.setAttribute('position', position);
       button.setAttribute('scale', '0.5 0.5 0.005');
       button.setAttribute('toggle-button', {
@@ -75,21 +76,23 @@ AFRAME.registerComponent('generate-hud', {
       tmc.flying = event.detail.state;
     });
 
+    /*
     const button3 = createButton('b3', '1 0.2 0', 'luna \nbounce', (event) => {
       console.log('Button state:', event.detail.state);
       const playerEl = document.querySelector('#player');
       const tmc = playerEl.components['terrain-movement'];
       tmc.lunaBounce = event.detail.state;
     });
+    */
 
     // Attempt to add player position to main Hud menu.
     // Create location text
     const locationText = document.createElement('a-text');
     const position = playerEl.object3D.position;
     locationText.setAttribute('id', 'hud-loco-text');
-    locationText.setAttribute('value', `X ${Math.floor(position.x)} Y ${Math.floor(position.y)} Z ${Math.floor(position.z)} | PC: 1`);
-    locationText.setAttribute('position', '-1 -0.75 0.01');
-    locationText.setAttribute('scale', '0.6 0.6 0.6');
+    locationText.setAttribute('value', `X ${Math.floor(position.x)} Z ${Math.floor(position.z)}   alt ${Math.floor(position.y)}`);
+    locationText.setAttribute('position', '0 -0.35 1');
+    locationText.setAttribute('scale', '0.8 0.8 0.8');
     locationText.setAttribute('align', 'center');
     locationText.setAttribute('color', '#EEE');
     panel.appendChild(locationText);
@@ -97,7 +100,7 @@ AFRAME.registerComponent('generate-hud', {
     // Add buttons to panel.
     panel.appendChild(button1);
     panel.appendChild(button2);
-    panel.appendChild(button3);
+    //panel.appendChild(button3);
 
     // Add panel to HUD.
     hudEntity.appendChild(panel);
@@ -121,7 +124,7 @@ AFRAME.registerComponent('generate-hud', {
         if (!locationText) return;
         
         const playerCount = window.playerCount || 1;
-        locationText.setAttribute('value', `X ${Math.floor(position.x)} Y ${Math.floor(position.y)} Z ${Math.floor(position.z)} | PC: ${playerCount}`);
+        locationText.setAttribute('value', `X ${Math.floor(position.x)} Z ${Math.floor(position.z)}   alt ${Math.floor(position.y)}`);
       } catch (err) {
         console.error("Error updating HUD:", err);
       }

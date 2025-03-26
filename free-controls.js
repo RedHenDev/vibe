@@ -318,10 +318,10 @@ AFRAME.registerComponent('free-controls', {
           this.touchDebugCount = 0;
         }
   
-        if (this.touchDebugCount < 5) {
-          console.log("Touch movement:", movementX, movementY);
-          this.touchDebugCount++;
-        }
+        // if (this.touchDebugCount < 5) {
+        //   console.log("Touch movement:", movementX, movementY);
+        //   this.touchDebugCount++;
+        // }
   
         const sensitivity = this.data.mobileSensitivity / 200;
   
@@ -346,11 +346,11 @@ AFRAME.registerComponent('free-controls', {
           document.webkitPointerLockElement === this.canvasEl) {
         this.pointerLocked = true;
         document.addEventListener('mousemove', this.onMouseMove, false);
-        console.log('Pointer locked');
+        //console.log('Pointer locked');
       } else {
         this.pointerLocked = false;
         document.removeEventListener('mousemove', this.onMouseMove, false);
-        console.log('Pointer unlocked');
+        //console.log('Pointer unlocked');
         if (this.isFullscreen && this.data.showFullscreenTip) {
           this.showFullscreenReminder();
         }
@@ -373,11 +373,11 @@ AFRAME.registerComponent('free-controls', {
         this.debugCount = 0;
       }
   
-      if (this.debugCount < 5) {
-        console.log("Mouse movement:", movementX, movementY);
-        console.log("Current camera rotation:", this.camera.rotation);
-        this.debugCount++;
-      }
+    //   if (this.debugCount < 5) {
+    //     console.log("Mouse movement:", movementX, movementY);
+    //     console.log("Current camera rotation:", this.camera.rotation);
+    //     this.debugCount++;
+    //   }
   
       this.camera.rotation.y -= movementX * sensitivity;
   

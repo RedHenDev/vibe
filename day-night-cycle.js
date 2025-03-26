@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
 AFRAME.registerComponent('day-night-cycle', {
   schema: {
     enabled: { type: 'boolean', default: true },
-    dayDuration: { type: 'number', default: 180000 }, // 3 minutes for day (in ms)
+    dayDuration: { type: 'number', default: 30000 }, // 3 minutes for day (in ms)
     nightDuration: { type: 'number', default: 60000 }, // 1 minute for night (in ms)
     transitionDuration: { type: 'number', default: 5000 }, // 5 seconds for transition (in ms)
     dayColor: { type: 'color', default: '#00DDFF' }, // Day sky color
     nightColor: { type: 'color', default: '#001133' }, // Night sky color
     dayWaterColor: { type: 'color', default: '#DD00DD' }, // Day water color
-    nightWaterColor: { type: 'color', default: '#990000' }, // Night water color (red)
+    nightWaterColor: { type: 'color', default: '#660000' }, // Night water color (red)
     showNotifications: { type: 'boolean', default: true } // Whether to show UI notifications
   },
   
@@ -35,7 +35,8 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Get references to scene elements
     this.sky = document.querySelector('a-sky');
-    
+    this.sun = document.querySelector('#hamlet');
+
     // The sea is implemented as an a-box inside the a-scene
     this.seaMesh = document.querySelector('a-box[scale="1000 0.01 1000"]');
     
@@ -69,6 +70,10 @@ AFRAME.registerComponent('day-night-cycle', {
     // Start in day mode
     this.setDayMode(true); // true = skip transition
     this.updateNpcManager(false);
+
+    // Integrate with vox.js for night/day music.
+    this.vox = document.querySelector("#music-system").audioElement; 
+
     console.log('Day-Night cycle component initialized');
   },
   
@@ -137,19 +142,19 @@ AFRAME.registerComponent('day-night-cycle', {
   },
   
   startDayTransition: function() {
-    console.log('Starting transition to day');
+    //console.log('Starting transition to day');
     this.isTransitioning = true;
     this.timeInState = 0;
     this.isNight = false;
     
     // Notify players if enabled
     if (this.data.showNotifications) {
-      this.showNotification('Sunlight returns...', '#44AAFF');
+      this.showNotification('Sunlight returns...', '#44AA00');
     }
   },
   
   startNightTransition: function() {
-    console.log('Starting transition to night');
+    //console.log('Starting transition to night');
     this.isTransitioning = true;
     this.timeInState = 0;
     this.isNight = true;
@@ -215,7 +220,7 @@ AFRAME.registerComponent('day-night-cycle', {
       color: this.lerpColor(this.data.nightColor, this.data.dayColor, progress),
       far: 200 + progress * 165 // Increase fog distance during day (200 -> 365)
     });
-    
+
     // Start transitioning NPC behavior gradually
     this.transitionNpcBehavior(progress, false);
   },
@@ -226,11 +231,18 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Notify players if enabled
     if (this.data.showNotifications) {
-      this.showNotification('Darkness reigns...', '#FF0000');
+      //this.showNotification('Darkness reigns...', '#FF0000');
     }
+
+    this.sun.setAttribute('light', 'intensity', 0.06);
+    // this.sun.components.light.data.intensity = 0.06;
+    // this.sun.components.light.update();
     
-    // Play night sound effect if you have one
+    // Play night sound effect if you have one.
+    if (this.vox){
+      this.vox.pause();
     this.playSound('night');
+    }
   },
   
   completeDayTransition: function() {
@@ -239,11 +251,18 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Notify players if enabled
     if (this.data.showNotifications) {
-      this.showNotification('The sun ascends! Safety...for now.', '#FFDD44');
+      //this.showNotification('The sun ascends! Safety...for now.', '#FFDD44');
     }
+
+    this.sun.setAttribute('light', 'intensity', 4.0);
+    // this.sun.components.light.data.intensity = 6.0;
+    // this.sun.components.light.update();
     
-    // Play day sound effect if you have one
-    this.playSound('day');
+    // Play day sound effect if you have one.
+    if (this.vox){
+      this.vox.play();
+    //this.playSound('day');
+    }
   },
   
   setNightMode: function(skipTransition = false) {
@@ -306,7 +325,7 @@ AFRAME.registerComponent('day-night-cycle', {
     // Try multiple approaches to update the sea color
     try {
       if (this.seaMesh) {
-        console.log('Updating sea color to:', color);
+        //console.log('Updating sea color to:', color);
         this.seaMesh.setAttribute('color', color);
         
         // Direct manipulation as fallback
@@ -386,7 +405,7 @@ AFRAME.registerComponent('day-night-cycle', {
       }
     }
     
-    console.log(`Day-Night cycle: Updated NPC behavior for ${isNight ? 'night' : 'day'} mode`);
+    //console.log(`Day-Night cycle: Updated NPC behavior for ${isNight ? 'night' : 'day'} mode`);
     
     // Force respawn some NPCs with the new behavior
     this.respawnSomeNpcs(npcSystem);
@@ -503,7 +522,7 @@ AFRAME.registerComponent('day-night-cycle', {
         const sound = document.createElement('a-entity');
         sound.setAttribute('id', soundID);
         sound.setAttribute('sound', {
-          src: type === 'night' ? 'url(./assets/eigengrau_light.mp3)' : 'url(./assets/pixel_wonder.mp3)',
+          src: type === 'night' ? './assets/eigengrau_light.mp3' : './assets/pixel_wonder.mp3',
           volume: 0.7,
           poolSize: 1
         });
@@ -563,6 +582,6 @@ AFRAME.registerComponent('day-night-cycle', {
       }
     }
     
-    console.log('Day-Night cycle: Restored original NPC configurations');
+    //console.log('Day-Night cycle: Restored original NPC configurations');
   }
 });

@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
       this.tracks = [
         './assets/pixel_wonder.mp3',
         './assets/shadows_of_the_system.mp3',
-        './assets/eigengrau_light.mp3',
         './assets/neon.mp3'
         // Add all your tracks here.
       ];
@@ -47,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
       this.trackNames = [
         'Pixel Wonder',
         'Shadows of the System',
-        'Eigengrau Light',
         'Neon'
         // Add names corresponding to your tracks
       ];

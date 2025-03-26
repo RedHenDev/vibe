@@ -166,7 +166,7 @@ AFRAME.registerComponent('portal-system', {
       const distanceToStart = this.calculateDistance(playerPos, startPortalPos);
       
       // If player is close to start portal
-      if (distanceToStart < 30) {
+      if (distanceToStart < 20) {
         this.enterStartPortal();
       }
     }

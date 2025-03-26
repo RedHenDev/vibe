@@ -86,7 +86,7 @@ AFRAME.registerSystem('npc-manager', {
             scale: '4 4 4',
             height: 2,
             speed: 0.5,
-            rSpeed: 1.2,
+            rSpeed: 4.2,
             clampY: true,
             wiggle: true,
             flee: false,
@@ -235,7 +235,9 @@ AFRAME.registerSystem('npc-manager', {
       const npcConfig = this.npcTypes[npc.type];
       
       // Update position
-      npc.el.setAttribute('position', `${spawnX} ${spawnY + npcConfig.height} ${spawnZ}`);
+      //npc.el.setAttribute('position', `${spawnX} ${spawnY + npcConfig.height} ${spawnZ}`);
+      // Spawn at -20 so that does not suddenly appear in air.
+      npc.el.setAttribute('position', `${spawnX} -20 ${spawnZ}`);
       
       // Restore original speed and activate
       const aiComponent = npc.el.components['ai-locomotion'];

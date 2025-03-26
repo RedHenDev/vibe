@@ -16,6 +16,9 @@ Glitch - backend
 VS-Code - IDE
 A-Frame (THREE.js under the hood) - VR and platform integration
 [to complete] shoot_01.mp3 - 
+http://www.freesoundslibrary.com - 'sonic coin sound' mp3
+
+
 
 CONTROLS:
 - Click anywhere to enable mouse look
@@ -32,7 +35,7 @@ triage
 
 2- performance version of terrain (if time, pooling of terrain chunks, cf. NPCs)
 
-3- portal
+3- 
 
 ad como key
 
@@ -66,9 +69,9 @@ DONE-refac temporary 'fix' -- remove miniHud
 -refac remove micro-hud as visible in default. Perhaps 'port' to menu
 have commented out in a-loco.js. Also will comment out or hide in index.html
 
--f metavibe portal
+DONE-f metavibe portal
 
--f avatars
+DONE-f avatars
 
 -f dome-like rocks or plant 'bulbs', on pattern of grass instancing
 
@@ -79,7 +82,7 @@ have commented out in a-loco.js. Also will comment out or hide in index.html
 -i collectibles called 'vibes' and the 'kaparthy diamond', the latter where subjects can choose a behaviour to happen to all other (or targeted?) subjects by avatar name, such as floating them upward to a certain height, then dropping; or all mobs swarming, etc.
 -i+ every 1 minute a new kaparthy dropped ('shipped'); then, if collected, this client has 5seconds to use, else start 1min wait again.
 
--f gamemode -- event triggers or just timed, 'night time' when sky goes dark and perhaps the more disturbing mobs appear
+DONE-f gamemode -- event triggers or just timed, 'night time' when sky goes dark and perhaps the more disturbing mobs appear
 
 -f headlights
 
@@ -93,15 +96,15 @@ DONE-f simple mobile button for locomotion
 
 DONE-f button to access menu on mobile
 
--f music
+DONE-f music
 
 -f sound effects
 
--dev pool terrain chunks
+DONE-dev pool terrain chunks
 
 DONE -dev pool npcs
 
--feature randomized names
+DONE-feature randomized names
 
 -f view other players (must include ability to view VR client)
 
@@ -111,9 +114,11 @@ DONE -dev pool npcs
 
 -b reinstate pitch of npcs
 
+-b mobs emerge from under terrain (avoids sudden appearance)
+
 DONE-b npc spawning DONE
 
--b npc spawning and states
+-b npc spawning and states - refine this.
 
 
 **

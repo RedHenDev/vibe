@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
           backdropFilter: 'blur(5px)',
           transition: 'opacity 0.5s ease-in-out',
           opacity: '0',
-          width: isMobile ? '85%' : '600px',
+          width: isMobile ? '90%' : '90%',
+          height: isMobile ? '90%' : '90%',
           maxWidth: '90%',
           border: '2px solid rgba(255, 255, 255, 0.2)'
         });
@@ -100,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
         // Create dismiss hint
         const dismissHint = document.createElement('div');
-        dismissHint.textContent = 'CLICK TO START';
+        dismissHint.textContent = 'CLICK PANEL TO START';
         Object.assign(dismissHint.style, {
           marginTop: '20px',
           fontSize: isMobile ? '14px' : '16px',
