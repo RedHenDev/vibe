@@ -8,6 +8,7 @@ AFRAME.registerComponent('the-sea', {
         this.pl = document.querySelector('#player').object3D;
 
         const bud = document.createElement('a-box');
+        bud.setAttribute('thalassa', '0 0 0')
         bud.setAttribute('position', '0 0 0');
         bud.setAttribute('scale','1000 0.01 1000');
         bud.setAttribute('color','#DD00DD');

@@ -35,15 +35,21 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Get references to scene elements
     this.sky = document.querySelector('a-sky');
-    this.seaEntity = document.querySelector('[the-sea]');
-    this.seaMesh = document.querySelector('[the-sea] a-box');
+    
+    // The sea is implemented as an a-box inside the a-scene
+    this.seaMesh = document.querySelector('a-box[scale="1000 0.01 1000"]');
     
     if (!this.sky) {
       console.warn('Day-Night cycle: Could not find a-sky element');
     }
     
-    if (!this.seaEntity || !this.seaMesh) {
-      console.warn('Day-Night cycle: Could not find sea element');
+    if (!this.seaMesh) {
+      console.warn('Day-Night cycle: Could not find sea element (a-box with large scale)');
+      // Try alternative selector
+      this.seaMesh = document.querySelector('a-scene > a-box');
+      if (this.seaMesh) {
+        console.log('Day-Night cycle: Found sea element using alternative selector');
+      }
     }
     
     // Get reference to NPC manager
@@ -62,7 +68,7 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Start in day mode
     this.setDayMode(true); // true = skip transition
-    
+    this.updateNpcManager(false);
     console.log('Day-Night cycle component initialized');
   },
   
@@ -138,7 +144,7 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Notify players if enabled
     if (this.data.showNotifications) {
-      this.showNotification('Dawn is breaking...', '#44AAFF');
+      this.showNotification('Sunlight returns...', '#44AAFF');
     }
   },
   
@@ -167,15 +173,16 @@ AFRAME.registerComponent('day-night-cycle', {
   },
   
   transitionToNight: function(progress) {
-    // Interpolate colors
+    // Interpolate sky color
     if (this.sky) {
       const skyColor = this.lerpColor(this.data.dayColor, this.data.nightColor, progress);
       this.sky.setAttribute('color', skyColor);
     }
     
-    if (this.seaMesh) {
-      const waterColor = this.lerpColor(this.data.dayWaterColor, this.data.nightWaterColor, progress);
-      this.seaMesh.setAttribute('color', waterColor);
+    // Set sea color to night color when halfway through transition
+    if (this.seaMesh && progress > 0.5 && !this.seaColorChanged) {
+      this.seaMesh.setAttribute('color', this.data.nightWaterColor);
+      this.seaColorChanged = true;
     }
     
     // Gradually adjust fog
@@ -190,15 +197,16 @@ AFRAME.registerComponent('day-night-cycle', {
   },
   
   transitionToDay: function(progress) {
-    // Interpolate colors
+    // Interpolate sky color
     if (this.sky) {
       const skyColor = this.lerpColor(this.data.nightColor, this.data.dayColor, progress);
       this.sky.setAttribute('color', skyColor);
     }
     
-    if (this.seaMesh) {
-      const waterColor = this.lerpColor(this.data.nightWaterColor, this.data.dayWaterColor, progress);
-      this.seaMesh.setAttribute('color', waterColor);
+    // Set sea color to day color when halfway through transition
+    if (this.seaMesh && progress > 0.5 && this.seaColorChanged) {
+      this.seaMesh.setAttribute('color', this.data.dayWaterColor);
+      this.seaColorChanged = false;
     }
     
     // Gradually adjust fog
@@ -218,7 +226,7 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Notify players if enabled
     if (this.data.showNotifications) {
-      this.showNotification('Night has fallen! Beware of aggressive creatures!', '#FF0000');
+      this.showNotification('Darkness reigns...', '#FF0000');
     }
     
     // Play night sound effect if you have one
@@ -231,7 +239,7 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Notify players if enabled
     if (this.data.showNotifications) {
-      this.showNotification('The sun rises! You are safe... for now.', '#FFDD44');
+      this.showNotification('The sun ascends! Safety...for now.', '#FFDD44');
     }
     
     // Play day sound effect if you have one
@@ -244,9 +252,9 @@ AFRAME.registerComponent('day-night-cycle', {
       this.sky.setAttribute('color', this.data.nightColor);
     }
     
-    if (this.seaMesh) {
-      this.seaMesh.setAttribute('color', this.data.nightWaterColor);
-    }
+    // Set sea color directly
+    this.updateSeaColor(this.data.nightWaterColor);
+    this.seaColorChanged = true;
     
     // Adjust fog
     document.querySelector('a-scene').setAttribute('fog', {
@@ -272,9 +280,9 @@ AFRAME.registerComponent('day-night-cycle', {
       this.sky.setAttribute('color', this.data.dayColor);
     }
     
-    if (this.seaMesh) {
-      this.seaMesh.setAttribute('color', this.data.dayWaterColor);
-    }
+    // Set sea color directly
+    this.updateSeaColor(this.data.dayWaterColor);
+    this.seaColorChanged = false;
     
     // Adjust fog
     document.querySelector('a-scene').setAttribute('fog', {
@@ -291,6 +299,35 @@ AFRAME.registerComponent('day-night-cycle', {
       this.isNight = false;
       this.isTransitioning = false;
       this.timeInState = 0;
+    }
+  },
+  
+  updateSeaColor: function(color) {
+    // Try multiple approaches to update the sea color
+    try {
+      if (this.seaMesh) {
+        console.log('Updating sea color to:', color);
+        this.seaMesh.setAttribute('color', color);
+        
+        // Direct manipulation as fallback
+        if (this.seaMesh.object3D && this.seaMesh.object3D.children && this.seaMesh.object3D.children.length > 0) {
+          const mesh = this.seaMesh.object3D.children[0];
+          if (mesh && mesh.material) {
+            mesh.material.color.set(color);
+            mesh.material.needsUpdate = true;
+          }
+        }
+      } else {
+        // Try to find it again if reference is lost
+        this.seaMesh = document.querySelector('a-box[scale="1000 0.01 1000"]') || 
+                     document.querySelector('a-scene > a-box');
+        
+        if (this.seaMesh) {
+          this.seaMesh.setAttribute('color', color);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to update sea color:', error);
     }
   },
   
@@ -313,6 +350,7 @@ AFRAME.registerComponent('day-night-cycle', {
         if (type === 'glasst') {
           npcTypes[type].spawnChance = 1.0; // 100% chance to spawn glassts
           npcTypes[type].speed = 12.0; // Make them faster at night
+          npcTypes[type].targetID = '#player';
           npcTypes[type].flee = false; // Make sure they chase, not flee
         } else {
           npcTypes[type].spawnChance = 0.0; // Don't spawn other types
@@ -465,7 +503,7 @@ AFRAME.registerComponent('day-night-cycle', {
         const sound = document.createElement('a-entity');
         sound.setAttribute('id', soundID);
         sound.setAttribute('sound', {
-          src: type === 'night' ? 'url(./assets/night_begin.mp3)' : 'url(./assets/day_begin.mp3)',
+          src: type === 'night' ? 'url(./assets/eigengrau_light.mp3)' : 'url(./assets/pixel_wonder.mp3)',
           volume: 0.7,
           poolSize: 1
         });

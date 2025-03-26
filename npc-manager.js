@@ -47,7 +47,8 @@ AFRAME.registerSystem('npc-manager', {
       this.npcTypes = {
         'glasst': {
           model: '#mGlasst',
-          scale: '1 1 1',
+          scale: '3 3 3',
+          targetID: '#player',
           height: 12,
           speed: 7,
           rSpeed: 0.9,
@@ -66,7 +67,7 @@ AFRAME.registerSystem('npc-manager', {
           clampY: false,
           wiggle: false,
           flee: false,
-          spawnChance: 0.10 // 0% chance to spawn this type
+          spawnChance: 0.20 // 0% chance to spawn this type
         },
         'fleer': {
           model: '#mGlasst', // Same model but flees from player
