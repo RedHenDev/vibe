@@ -1,14 +1,5 @@
-/*
-this.tracks = [
-    './assets/pixel_wonder.mp3',
-    './assets/shadows_of_the_system.mp3',
-    './assets/eigengrau_light.mp3'
-    // Add all your tracks here
-  ];
-*/
-
-// Music System for Eigengrau Vibe
-// A simple background music manager with controls
+// Music System for Eigengrau Light
+// A simple background music manager with controls and day/night cycle integration
 
 document.addEventListener('DOMContentLoaded', () => {
     const scene = document.querySelector('a-scene');
@@ -28,9 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
       enabled: { type: 'boolean', default: true },
       volume: { type: 'number', default: 0.5 },
       currentTrack: { type: 'number', default: 0 },
+      lastPlayedTrack: { type: 'number', default: -1 }, // Track the last played track index
       autoplay: { type: 'boolean', default: true },
       fadeTime: { type: 'number', default: 2.0 }, // Fade in/out time in seconds
-      randomizeFirst: { type: 'boolean', default: true } // Start with a random track
+      randomizeFirst: { type: 'boolean', default: true }, // Start with a random track
+      isNightTime: { type: 'boolean', default: false } // Track day/night state
     },
     
     init: function() {
@@ -38,21 +31,25 @@ document.addEventListener('DOMContentLoaded', () => {
       this.tracks = [
         './assets/pixel_wonder.mp3',
         './assets/shadows_of_the_system.mp3',
-        './assets/neon.mp3'
-        // Add all your tracks here.
+        './assets/neon.mp3',
+        './assets/eigengrau_light.mp3' // Night track
       ];
       
-      // Track names for display.
+      // Track names for display
       this.trackNames = [
         'Pixel Wonder',
         'Shadows of the System',
-        'Neon'
-        // Add names corresponding to your tracks
+        'Neon',
+        'Eigengrau Light'
       ];
       
+      // Track indices for day/night selection
+      this.dayTracks = [0, 1, 2]; // Indices of tracks to use during day
+      this.nightTrack = 3; // Index of eigengrau_light.mp3
+      
       // Randomize starting track if enabled
-      if (this.data.randomizeFirst && this.tracks.length > 1) {
-        this.data.currentTrack = Math.floor(Math.random() * this.tracks.length);
+      if (this.data.randomizeFirst && this.dayTracks.length > 0) {
+        this.data.currentTrack = this.dayTracks[Math.floor(Math.random() * this.dayTracks.length)];
         console.log(`Music system: Randomized starting track: ${this.data.currentTrack + 1} - ${this.trackNames[this.data.currentTrack]}`);
       }
       
@@ -85,7 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       
-      // Debug info
+      // Set global reference for other components to access
+      window.musicSystem = this;
+      
       console.log(`Music system ready with ${this.tracks.length} tracks`);
     },
     
@@ -124,46 +123,109 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     
     playTrack: function(trackIndex) {
-        if (trackIndex >= 0 && trackIndex < this.tracks.length) {
-          this.data.currentTrack = trackIndex;
-          
-          const changeAndPlay = () => {
-            this.audioElement.src = this.tracks[trackIndex];
-            this.audioElement.load();
-            const playPromise = this.audioElement.play();
-            if (playPromise !== undefined) {
-              playPromise.then(() => {
-                this.fadeIn();
-                this.updateMusicButton(true);
-              }).catch(error => {
-                console.log('Playback prevented by browser', error);
-              });
-            }
-          };
-          
-          if (!this.audioElement.paused) {
-            this.fadeOut(changeAndPlay);
-          } else {
-            changeAndPlay();
+      if (trackIndex >= 0 && trackIndex < this.tracks.length) {
+        // Store the previous track before changing
+        this.data.lastPlayedTrack = this.data.currentTrack;
+        this.data.currentTrack = trackIndex;
+        
+        const changeAndPlay = () => {
+          this.audioElement.src = this.tracks[trackIndex];
+          this.audioElement.load();
+          const playPromise = this.audioElement.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              this.fadeIn();
+              this.updateMusicButton(true);
+            }).catch(error => {
+              console.log('Playback prevented by browser', error);
+            });
           }
-          
-          this.showTrackNotification(this.trackNames[trackIndex] || `Track ${trackIndex + 1}`);
+        };
+        
+        if (!this.audioElement.paused) {
+          this.fadeOut(changeAndPlay);
+        } else {
+          changeAndPlay();
         }
-      },
+        
+        this.showTrackNotification(this.trackNames[trackIndex] || `Track ${trackIndex + 1}`);
+      }
+    },
+    
+    // Set night mode - called by day-night-cycle.js when night begins
+    setNightMode: function() {
+      // Only change if not already in night mode
+      if (!this.data.isNightTime) {
+        this.data.isNightTime = true;
+        console.log('Music system: Switching to night mode');
+        
+        // Only change track if music is already playing
+        if (!this.audioElement.paused) {
+          this.playTrack(this.nightTrack);
+        }
+      }
+    },
+    
+    // Set day mode - called by day-night-cycle.js when day begins
+    setDayMode: function() {
+      // Only change if not already in day mode
+      if (this.data.isNightTime) {
+        this.data.isNightTime = false;
+        console.log('Music system: Switching to day mode');
+        
+        // Only change track if music is already playing
+        if (!this.audioElement.paused) {
+          this.playRandomDayTrack();
+        }
+      }
+    },
+    
+    // Play a random day track (avoiding the last played track)
+    playRandomDayTrack: function() {
+      // Filter out the last played track from options
+      const availableTracks = this.dayTracks.filter(index => 
+        index !== this.data.lastPlayedTrack
+      );
+      
+      // Pick a random track from available options
+      const randomIndex = Math.floor(Math.random() * availableTracks.length);
+      const trackToPlay = availableTracks[randomIndex];
+      
+      this.playTrack(trackToPlay);
+    },
     
     nextTrack: function() {
-      const nextIndex = (this.data.currentTrack + 1) % this.tracks.length;
-      this.playTrack(nextIndex);
-      // Added toggle call to start track.
-      //this.toggleMusic();
+      if (this.data.isNightTime) {
+        // If night time, stick with night track
+        this.playTrack(this.nightTrack);
+      } else {
+        // Store current as last played
+        this.data.lastPlayedTrack = this.data.currentTrack;
+        
+        // Get available daylight tracks (exclude night track and last played)
+        const availableTracks = this.dayTracks.filter(index => 
+          index !== this.data.lastPlayedTrack
+        );
+        
+        // Pick a random track from available options
+        const randomIndex = Math.floor(Math.random() * availableTracks.length);
+        const trackToPlay = availableTracks[randomIndex];
+        
+        this.playTrack(trackToPlay);
+      }
     },
     
     previousTrack: function() {
-      let prevIndex = this.data.currentTrack - 1;
-      if (prevIndex < 0) prevIndex = this.tracks.length - 1;
-      this.playTrack(prevIndex);
-      // Added toggle call to start track.
-      //this.toggleMusic();
+      if (this.data.isNightTime) {
+        // If night time, stick with night track
+        this.playTrack(this.nightTrack);
+      } else if (this.data.lastPlayedTrack >= 0 && this.dayTracks.includes(this.data.lastPlayedTrack)) {
+        // Go to actual previous track that was played (if it's a day track)
+        this.playTrack(this.data.lastPlayedTrack);
+      } else {
+        // If no valid previous track, get a random day track
+        this.playRandomDayTrack();
+      }
     },
     
     fadeIn: function() {
@@ -214,10 +276,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     toggleMusic: function() {
       if (this.audioElement.paused) {
-        // Start playing
-        this.audioElement.play();
-        this.fadeIn();
-        this.updateMusicButton(true);
+        // Start playing - appropriate track for current day/night state
+        if (this.data.isNightTime) {
+          this.playTrack(this.nightTrack);
+        } else {
+          // Play current track or a random day track
+          const currentIsDay = this.dayTracks.includes(this.data.currentTrack);
+          if (currentIsDay) {
+            this.playTrack(this.data.currentTrack);
+          } else {
+            this.playRandomDayTrack();
+          }
+        }
       } else {
         // Pause with fade out
         this.fadeOut(() => {
@@ -320,10 +390,24 @@ document.addEventListener('DOMContentLoaded', () => {
         this.previousTrack();
       }
       
-      // Number keys 1-9 for direct track selection
+      // Number keys 1-9 for direct track selection - only allow day tracks during day
       const keyNum = parseInt(event.key);
       if (!isNaN(keyNum) && keyNum >= 1 && keyNum <= Math.min(9, this.tracks.length)) {
-        this.playTrack(keyNum - 1);
+        const trackIndex = keyNum - 1;
+        
+        // If it's night time, only allow the night track
+        if (this.data.isNightTime && trackIndex !== this.nightTrack) {
+          this.showTrackNotification('Only night music is available during night time');
+          return;
+        }
+        
+        // If it's day time, only allow day tracks
+        if (!this.data.isNightTime && trackIndex === this.nightTrack) {
+          this.showTrackNotification('Night music is only available during night time');
+          return;
+        }
+        
+        this.playTrack(trackIndex);
       }
     },
     
@@ -358,15 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (this.trackNotification && this.trackNotification.parentNode) {
         this.trackNotification.parentNode.removeChild(this.trackNotification);
       }
-    },
-    
-    // For integration with welcome-message.js
-    updateWelcomeMessage: function() {
-      // This method could be called from welcome-message.js if you want to
-      // customize the welcome message dynamically based on music settings
-      return {
-        hasMusicSystem: true,
-        trackCount: this.tracks.length
-      };
+      
+      // Remove global reference
+      delete window.musicSystem;
     }
   });

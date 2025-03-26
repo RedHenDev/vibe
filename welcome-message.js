@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     AFRAME.registerComponent('welcome-message', {
       schema: {
         title: { default: 'Eigengrau Light v1.0' },
-        duration: { type: 'number', default: 24000 }, // How long to show message (ms)
+        duration: { type: 'number', default: 240000 }, // How long to show message (ms)
         mobileText: { type: 'string', default: 'swipe to turn • walk button to move' },
-        desktopText: { type: 'string', default: 'SHIFT toggles run • SPACE for menu' },
-        vrText: { type: 'string', default: 'Tilt head left toggles walk • Tilt head right toggles menu' },
-        goalText: { type: 'string', default: 'Navigate this infinite world • Collect vibes • Beware the night!' }
+        desktopText: { type: 'string', default: '• SPACE for menu' },
+        vrText: { type: 'string', default: 'tilt head left toggles walk • tilt head right toggles menu' },
+        goalText: { type: 'string', default: 'explore infinite world • collect vibes • beware the night!' }
       },
   
       init: function() {
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
         // Create dismiss hint
         const dismissHint = document.createElement('div');
-        dismissHint.textContent = 'CLICK PANEL TO START';
+        dismissHint.textContent = 'CLICK TO START';
         Object.assign(dismissHint.style, {
           marginTop: '20px',
           fontSize: isMobile ? '14px' : '16px',

@@ -14,7 +14,7 @@ AFRAME.registerComponent('generate-hud', {
 
     // Create background panel (plane)
     const panel = document.createElement('a-plane');
-    panel.setAttribute('position', '0 0 -3');
+    panel.setAttribute('position', '0 0 -4.4');
     panel.setAttribute('rotation', '0 0 0');
     panel.setAttribute('width', '4');
     panel.setAttribute('height', '2');
@@ -28,10 +28,10 @@ AFRAME.registerComponent('generate-hud', {
     const titleText = document.createElement('a-text');
     titleText.setAttribute('id', 'hud-text');
     titleText.setAttribute('value', 'menu');
-    titleText.setAttribute('position', '0 0.25 1.3');
+    titleText.setAttribute('position', '0 0.4 1.3');
     titleText.setAttribute('scale', '1 1 1');
     titleText.setAttribute('align', 'center');
-    titleText.setAttribute('color', '#0ED');
+    titleText.setAttribute('color', '#EEE');
     panel.appendChild(titleText);
 
     // Function to create buttons

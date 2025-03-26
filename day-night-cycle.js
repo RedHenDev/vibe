@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 AFRAME.registerComponent('day-night-cycle', {
   schema: {
     enabled: { type: 'boolean', default: true },
-    dayDuration: { type: 'number', default: 30000 }, // 3 minutes for day (in ms)
-    nightDuration: { type: 'number', default: 60000 }, // 1 minute for night (in ms)
+    dayDuration: { type: 'number', default: 300000 }, // 3 minutes for day (in ms)
+    nightDuration: { type: 'number', default: 120000 }, // 2 minutes for night (in ms)
     transitionDuration: { type: 'number', default: 5000 }, // 5 seconds for transition (in ms)
     dayColor: { type: 'color', default: '#00DDFF' }, // Day sky color
     nightColor: { type: 'color', default: '#001133' }, // Night sky color
@@ -37,7 +37,7 @@ AFRAME.registerComponent('day-night-cycle', {
     this.sky = document.querySelector('a-sky');
     this.sun = document.querySelector('#hamlet');
 
-    // The sea is implemented as an a-box inside the a-scene
+    // The sea is implemented as a-box inside the a-scene
     this.seaMesh = document.querySelector('a-box[scale="1000 0.01 1000"]');
     
     if (!this.sky) {
@@ -70,9 +70,6 @@ AFRAME.registerComponent('day-night-cycle', {
     // Start in day mode
     this.setDayMode(true); // true = skip transition
     this.updateNpcManager(false);
-
-    // Integrate with vox.js for night/day music.
-    this.vox = document.querySelector("#music-system").audioElement; 
 
     console.log('Day-Night cycle component initialized');
   },
@@ -235,13 +232,10 @@ AFRAME.registerComponent('day-night-cycle', {
     }
 
     this.sun.setAttribute('light', 'intensity', 0.06);
-    // this.sun.components.light.data.intensity = 0.06;
-    // this.sun.components.light.update();
     
-    // Play night sound effect if you have one.
-    if (this.vox){
-      this.vox.pause();
-    this.playSound('night');
+    // Update music system without directly controlling audio
+    if (window.musicSystem) {
+      window.musicSystem.setNightMode();
     }
   },
   
@@ -255,13 +249,10 @@ AFRAME.registerComponent('day-night-cycle', {
     }
 
     this.sun.setAttribute('light', 'intensity', 4.0);
-    // this.sun.components.light.data.intensity = 6.0;
-    // this.sun.components.light.update();
     
-    // Play day sound effect if you have one.
-    if (this.vox){
-      this.vox.play();
-    //this.playSound('day');
+    // Update music system without directly controlling audio
+    if (window.musicSystem) {
+      window.musicSystem.setDayMode();
     }
   },
   
