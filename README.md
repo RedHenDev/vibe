@@ -31,11 +31,11 @@ CONTROLS:
 
 triage
 
-1- simplified collectibles (plus sounds/textures)
+1- -dev projectile pulse (light kick to other players and npcs)
 
-2- performance version of terrain (if time, pooling of terrain chunks, cf. NPCs)
+2- -dev leaderboard vibes (distance travelled?)
 
-3- 
+3- -dev woods in only certain areas; option to decide manually as well as 'background' deployment of wooded areas from world seed.
 
 ad como key
 
@@ -47,15 +47,27 @@ ad como key
 
 to do
 
+-f sync night mode across clients.
+
+-f quake style portal effect
+
+-f asteroid showers
+
+-f rain
+
+-b night and day mode npcs -- with correct swarming of clients
+
+DONE-refac simplified collectibles (plus sounds/textures)
+
 DONE-bVR mode freezes when tilting right: refs commented out minihub?
 
--i optimize more fully in anticipation of less capable machines
+DONE-i optimize more fully in anticipation of less capable machines
 
--dev woods in only certain areas; option to decide manually as well as 'background' deployment of wooded areas from world seed.
+DONE -dev performance version of terrain (if time, pooling of terrain chunks, cf. NPCs)
 
 -f bioluminescent mushrooms and, or, will 'o the wisps.
 
--i just one track for entire game (to keep lightweight). OK, maybe two -- since we have ambient and a lyrical.
+DONE-i just one track for entire game (to keep lightweight). OK, maybe three -- since we have ambient and a lyrical.
 
 DONE-i ambient music track: is there a term for music that does not exhaust the ear, but whose melodies and other properties find themselves welcome and even addicting for the listener?
 [Yes - fatigue.]
@@ -66,7 +78,7 @@ DONE-refac adjust positions and possibly colours of ui buttons (music and menu) 
 
 DONE-refac temporary 'fix' -- remove miniHud
 
--refac remove micro-hud as visible in default. Perhaps 'port' to menu
+DONE-refac remove micro-hud as visible in default. Perhaps 'port' to menu
 have commented out in a-loco.js. Also will comment out or hide in index.html
 
 DONE-f metavibe portal
@@ -79,12 +91,12 @@ DONE-f avatars
 
 -i huge quarry machines and loader vehicles hauling off mysterious cubes with numbers on them (secret: farming the digits of pi 'for use in the human world -- all numbers are created here'); other ideas, naming clients after Mathematicians and mathematical concepts; quarry of prime numbers?
 
--i collectibles called 'vibes' and the 'kaparthy diamond', the latter where subjects can choose a behaviour to happen to all other (or targeted?) subjects by avatar name, such as floating them upward to a certain height, then dropping; or all mobs swarming, etc.
+DONE-i collectibles called 'vibes' and the 'kaparthy diamond', the latter where subjects can choose a behaviour to happen to all other (or targeted?) subjects by avatar name, such as floating them upward to a certain height, then dropping; or all mobs swarming, etc.
 -i+ every 1 minute a new kaparthy dropped ('shipped'); then, if collected, this client has 5seconds to use, else start 1min wait again.
 
 DONE-f gamemode -- event triggers or just timed, 'night time' when sky goes dark and perhaps the more disturbing mobs appear
 
--f headlights
+DONE-f headlights [TORCH AT NIGHT]
 
 DONE-f clouds
 
@@ -98,7 +110,7 @@ DONE-f button to access menu on mobile
 
 DONE-f music
 
--f sound effects
+DONE-f sound effects
 
 DONE-dev pool terrain chunks
 

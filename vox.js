@@ -1,4 +1,4 @@
-// Music System for Eigengrau Light
+// Music System for Eigengrau Light (FIXED)
 // A simple background music manager with controls and day/night cycle integration
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Create audio element
       this.audioElement = document.createElement('audio');
-      this.audioElement.loop = true;
+      this.audioElement.loop = false; // FIXED: Set to false to allow tracks to change automatically
       this.audioElement.volume = 0; // Start at 0 for fade-in
       this.audioElement.setAttribute('preload', 'auto');
       
@@ -75,11 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
       this.onKeyDown = this.onKeyDown.bind(this);
       document.addEventListener('keydown', this.onKeyDown);
       
-      // Handle track ended event to possibly play next track
+      // Handle track ended event to play next track
       this.audioElement.addEventListener('ended', () => {
-        if (!this.audioElement.loop) {
-          this.nextTrack();
-        }
+        // FIXED: This will now trigger since loop is false
+        this.nextTrack();
       });
       
       // Set global reference for other components to access

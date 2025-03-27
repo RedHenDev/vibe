@@ -18,14 +18,16 @@ AFRAME.registerComponent('grass-system', {
     schema: {
       chunkSize: { type: 'number', default: 64 },           // Size of each chunk in meters
       renderDistance: { type: 'number', default: 128 },      // Max distance to render grass
-      instancesPerChunk: { type: 'number', default: 3000 },  // Grass blades per chunk
+      instancesPerChunk: { type: 'number', default: 4000 },  // Grass blades per chunk
       updateThreshold: { type: 'number', default: 32 },      // Distance player must move to trigger update
       minHeight: { type: 'number', default: 1.0 },           // Minimum grass height
       maxHeight: { type: 'number', default: 2.5 },           // Maximum grass height
-      //baseColor: { type: 'color', default: '#16161D' },      // Base grass color
-      baseColor: { type: 'color', default: '#00D200' },
-      chunksPerFrame: { type: 'number', default: 2 },        // Chunks to generate per frame
-      colorVariation: { type: 'number', default: 0.2 }       // Color variation amount (0-1)
+      dayColor: { type: 'color', default: '#00D200' },       // Day grass color
+      nightColor: { type: 'color', default: '#16161D' },     // Night grass color (very dark gray)
+      baseColor: { type: 'color', default: '#00D200' },      // Current color (changes with day/night)
+      chunksPerFrame: { type: 'number', default: 1 },        // Chunks to generate per frame
+      colorVariation: { type: 'number', default: 0.2 },      // Color variation amount (0-1)
+      isNightMode: { type: 'boolean', default: false }       // Track day/night state
     },
   
     init: function () {
@@ -41,6 +43,10 @@ AFRAME.registerComponent('grass-system', {
       
       // Define grass blade geometry and material
       this.geometry = new THREE.PlaneGeometry(0.2, 2.0); // Width and unit height (will be scaled)
+      
+      // Set base color based on day/night mode
+      this.data.baseColor = this.data.isNightMode ? this.data.nightColor : this.data.dayColor;
+      
       this.material = new THREE.MeshBasicMaterial({
         color: this.data.baseColor,
         side: THREE.DoubleSide
@@ -56,11 +62,48 @@ AFRAME.registerComponent('grass-system', {
       // Get player reference
       this.player = this.el.sceneEl.querySelector('#player').object3D;
       
+      // Make grass system accessible to other components
+      window.grassSystem = this;
+      
       // Initialize chunks around player
       if (this.player) {
         this.queueInitialChunks();
         this.lastUpdatePosition.copy(this.player.position);
         console.log('Grass system initialized, chunks queued for loading');
+      }
+    },
+    
+    // Add methods to change grass colors for day/night cycle
+    setNightMode: function() {
+      if (this.data.isNightMode) return; // Already in night mode
+      
+      this.data.isNightMode = true;
+      this.data.baseColor = this.data.nightColor;
+      this.baseColorVector = new THREE.Color(this.data.baseColor);
+      
+      // Update existing grass chunks
+      this.updateExistingGrassColors();
+    },
+    
+    setDayMode: function() {
+      if (!this.data.isNightMode) return; // Already in day mode
+      
+      this.data.isNightMode = false;
+      this.data.baseColor = this.data.dayColor;
+      this.baseColorVector = new THREE.Color(this.data.baseColor);
+      
+      // Update existing grass chunks
+      this.updateExistingGrassColors();
+    },
+    
+    updateExistingGrassColors: function() {
+      // For each existing chunk, update its material color
+      for (const [key, chunk] of this.chunks.entries()) {
+        if (chunk.instancedMesh && chunk.instancedMesh.material) {
+          // Update base material color
+          chunk.instancedMesh.material.color.copy(this.baseColorVector);
+          chunk.instancedMesh.material.needsUpdate = true;
+        }
       }
     },
     
@@ -222,11 +265,11 @@ AFRAME.registerComponent('grass-system', {
         const y = this.getHeight(x, z); // Get terrain height
         
         // Add some terrain awareness - avoid placing grass in water
-        if (y < -11) {
+        if (y < -11 || x > 128 & x < 256) {
           // Skip this instance or place less grass in water
-          if (Math.random() > 0.2) {
+        //   if (Math.random() > 0.2) {
             continue;
-          }
+        //   }
         }
         
         positions.push(new THREE.Vector3(x, y, z));
@@ -248,10 +291,13 @@ AFRAME.registerComponent('grass-system', {
         // Random color variation
         const random = Math.random() * colorVariation * 2 - colorVariation; // -var to +var
         
+        // Apply less variation at night for more uniform dark appearance
+        const variationAmount = this.data.isNightMode ? 0.05 : 0.4;
+        
         // Apply color adjustments
-        tempColor.r = Math.max(0, Math.min(1, tempColor.r * (0.8 + terrainFactor * 0.4 + random)));
-        tempColor.g = Math.max(0, Math.min(1, tempColor.g * (0.8 + terrainFactor * 0.4 + random)));
-        tempColor.b = Math.max(0, Math.min(1, tempColor.b * (0.8 + terrainFactor * 0.3 + random)));
+        tempColor.r = Math.max(0, Math.min(1, tempColor.r * (0.8 + terrainFactor * variationAmount + random)));
+        tempColor.g = Math.max(0, Math.min(1, tempColor.g * (0.8 + terrainFactor * variationAmount + random)));
+        tempColor.b = Math.max(0, Math.min(1, tempColor.b * (0.8 + terrainFactor * variationAmount + random)));
         
         colors.push(tempColor.clone());
       }
@@ -397,5 +443,8 @@ AFRAME.registerComponent('grass-system', {
       for (const key of this.chunks.keys()) {
         this.finalizeChunkRemoval(key);
       }
+      
+      // Remove global reference
+      delete window.grassSystem;
     }
 });

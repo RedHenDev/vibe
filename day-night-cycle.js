@@ -23,7 +23,7 @@ AFRAME.registerComponent('day-night-cycle', {
     dayColor: { type: 'color', default: '#00DDFF' }, // Day sky color
     nightColor: { type: 'color', default: '#001133' }, // Night sky color
     dayWaterColor: { type: 'color', default: '#DD00DD' }, // Day water color
-    nightWaterColor: { type: 'color', default: '#660000' }, // Night water color (red)
+    nightWaterColor: { type: 'color', default: '#770000' }, // Night water color (red)
     showNotifications: { type: 'boolean', default: true } // Whether to show UI notifications
   },
   
@@ -237,6 +237,11 @@ AFRAME.registerComponent('day-night-cycle', {
     if (window.musicSystem) {
       window.musicSystem.setNightMode();
     }
+    
+    // Update grass system to night mode
+    if (window.grassSystem) {
+      window.grassSystem.setNightMode();
+    }
   },
   
   completeDayTransition: function() {
@@ -253,6 +258,11 @@ AFRAME.registerComponent('day-night-cycle', {
     // Update music system without directly controlling audio
     if (window.musicSystem) {
       window.musicSystem.setDayMode();
+    }
+    
+    // Update grass system to day mode
+    if (window.grassSystem) {
+      window.grassSystem.setDayMode();
     }
   },
   

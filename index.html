@@ -2,11 +2,12 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Eigengrau Light v0.93</title>
+    <title>Eigengrau Light v1.01</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <!-- For terrain generation using procedural noise -->
     <script src="urizen.js" data-seed="1"></script>
-    <!-- <script src="rocky-archways.js"></script> -->
+    
+    <script src="player-torch.js"></script>
     <script src="fps-counter.js"></script>
     <!-- Enhanced AI system -->
     <script src="ai_sys.js"></script>
@@ -28,6 +29,7 @@
     <!-- <script src="model-sys.js"></script> -->
     <!-- <script src="pyramid-scheme.js"></script> -->
     <script src="vox.js"></script>
+    <script src="vr-only-fuse.js"></script>
     
     <style>
         body {
@@ -119,7 +121,8 @@
         <!-- Player with terrain locomotion system -->
         <a-entity id="player" position="0 25 0" terrain-movement="height: 4.6">
             <!-- <a-camera id="cam" wasd-controls="enabled: false"> -->
-                <a-camera id="cam" free-controls="enabled: true; sensitivity: 2.0;" wasd-controls="enabled: false">    
+                <a-camera id="cam" free-controls="enabled: true; sensitivity: 2.0;" 
+                        wasd-controls="enabled: false" vr-only-fuse>    
                 <!-- micro HUD Interface -->
                 
                 <!-- <a-entity id="micro-hud"> -->
@@ -276,5 +279,7 @@
     <script src="performance-upgrade.js"></script>
     <script src="portal.js"></script>
     <script src="day-night-cycle.js"></script>
+    <script src="projectile-system.js"></script>
+    <!-- <script src="rocky-archways.js"></script> -->
 </body>
 </html>
