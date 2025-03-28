@@ -1,10 +1,10 @@
 // Projectile System for Eigengrau Light
 // Allows players to fire projectiles that can push other entities
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     const scene = document.querySelector('a-scene');
     if (scene) {
-      scene.addEventListener('loaded', () => {
+      scene.addEventListener('loaded', function() {
         const projectileSystemEntity = document.createElement('a-entity');
         projectileSystemEntity.setAttribute('id', 'projectile-system');
         projectileSystemEntity.setAttribute('projectile-system', '');
@@ -18,15 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
   AFRAME.registerComponent('projectile-system', {
     schema: {
       maxProjectiles: { type: 'number', default: 50 },       // Maximum number of projectiles
-      projectileSpeed: { type: 'number', default: 60 },      // Speed of projectiles
-      projectileLifetime: { type: 'number', default: 2000 }, // How long projectiles live (ms)
+      projectileSpeed: { type: 'number', default: 99 },      // Speed of projectiles
+      projectileLifetime: { type: 'number', default: 4000 }, // How long projectiles live (ms)
       impactLifetime: { type: 'number', default: 2000 },     // How long projectiles remain after impact (ms)
       cooldown: { type: 'number', default: 200 },            // Cooldown between shots (ms)
-      pushForce: { type: 'number', default: 9 },             // Force applied when hitting targets
-      projectileColor: { type: 'color', default: '#0000FF' }, // Icy blue projectile color
+      pushForce: { type: 'number', default: 5 },             // Force applied when hitting targets
+      projectileColor: { type: 'color', default: '#16161D' }, // Icy blue projectile color
       projectileSize: { type: 'number', default: 0.5 },      // Size of projectiles
       trailEnabled: { type: 'boolean', default: true },      // Enable trail effects
-      debug: { type: 'boolean', default: false }              // Show debug info
+      showFireButton: { type: 'boolean', default: true },    // Show fire button on mobile
+      debug: { type: 'boolean', default: false },             // Show debug info
+      enabled: { type: 'boolean', default: true }            // Enable/disable the system
     },
     
     init: function() {
@@ -46,14 +48,26 @@ document.addEventListener('DOMContentLoaded', () => {
       // Get terrain function for height checks
       this.getTerrainHeight = window.getTerrainHeight;
       
+      // Check if mobile device
+      this.isMobile = AFRAME.utils.device.isMobile();
+      
       // Bind event listeners
       this.onMouseDown = this.onMouseDown.bind(this);
-      document.addEventListener('mousedown', this.onMouseDown);
+      this.onTouchStart = this.onTouchStart.bind(this);
       
-      // Set up interval to check for head tilt
-      this.checkInterval = setInterval(() => {
-        this.checkHeadTilt();
-      }, 100);
+      // Add appropriate event listeners based on device
+      if (this.isMobile) {
+        // Mobile: add touch events
+        document.addEventListener('touchstart', this.onTouchStart);
+        console.log('Projectile system using touch controls');
+      } else {
+        // Desktop: add mouse events
+        document.addEventListener('mousedown', this.onMouseDown);
+        console.log('Projectile system using mouse controls');
+      }
+      
+      // Set up interval to check for head tilt (useful for VR)
+      this.checkInterval = setInterval(this.checkHeadTilt.bind(this), 100);
       
       // Add debug UI for projectile count
       if (this.data.debug) {
@@ -63,37 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Projectile system ready');
     },
     
-    createDebugUI: function() {
-      const debugEl = document.createElement('div');
-      debugEl.id = 'projectile-debug';
-      Object.assign(debugEl.style, {
-        position: 'fixed',
-        top: '60px',
-        left: '10px',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        color: 'white',
-        padding: '5px 10px',
-        borderRadius: '5px',
-        fontFamily: 'monospace',
-        fontSize: '12px',
-        zIndex: '1000'
-      });
-      document.body.appendChild(debugEl);
-      
-      // Update debug info periodically
-      setInterval(() => {
-        const activeCount = this.active.filter(active => active).length;
-        debugEl.textContent = `Projectiles: ${activeCount}/${this.data.maxProjectiles}`;
-      }, 500);
-    },
-    
     initProjectileInstances: function() {
       // Create a single geometry for all projectiles - larger size and more segments
       const geometry = new THREE.SphereGeometry(this.data.projectileSize, 12, 12);
       
       // Create material with icy blue color
       const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color('#00CCFF'),
+        color: new THREE.Color(this.data.projectileColor),
         transparent: true,
         opacity: 0.8,
         side: THREE.DoubleSide
@@ -129,12 +119,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (this.data.trailEnabled) {
         this.createTrailEffect();
       }
+      
+      // On mobile, add a fire button
+      if (this.isMobile && this.data.showFireButton) {
+        this.createFireButton();
+      }
     },
     
     createTrailEffect: function() {
       // Create a more transparent white trail
       this.trailMaterial = new THREE.MeshBasicMaterial({
-        color: new THREE.Color('#FFFFFF'),
+        color: new THREE.Color('#00CCFF'),
         transparent: true,
         opacity: 0.3,
         side: THREE.DoubleSide
@@ -155,6 +150,152 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       this.el.object3D.add(this.trailMesh);
+    },
+    
+    createFireButton: function() {
+      // Create fire button for mobile
+      this.fireButton = document.createElement('button');
+      this.fireButton.className = 'fire-button';
+      this.fireButton.textContent = '🔥 Fire';
+      
+      // Style the button
+      Object.assign(this.fireButton.style, {
+        position: 'fixed',
+        bottom: '26px',
+        right: '10px',
+        padding: '15px 25px',
+        border: 'none',
+        borderRadius: '30px',
+        backgroundColor: 'rgba(0, 204, 255, 0.7)',
+        color: 'white',
+        fontFamily: 'Arial, sans-serif',
+        fontSize: '18px',
+        fontWeight: 'bold',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+        zIndex: '1000',
+        transition: 'background-color 0.3s, transform 0.1s'
+      });
+      
+      // Add touch handlers
+      this.fireButton.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        this.style.transform = 'scale(0.95)';
+        this.style.backgroundColor = 'rgba(0, 150, 255, 0.9)';
+      });
+      
+      // Use a named function for the touchend event
+      const fireButtonTouchEnd = function(e) {
+        e.preventDefault();
+        this.fireProjectile();
+        this.fireButton.style.transform = '';
+        this.fireButton.style.backgroundColor = 'rgba(0, 204, 255, 0.7)';
+      }.bind(this);
+      
+      this.fireButton.addEventListener('touchend', fireButtonTouchEnd);
+      
+      // Add to DOM
+      document.body.appendChild(this.fireButton);
+    },
+    
+    createDebugUI: function() {
+      const debugEl = document.createElement('div');
+      debugEl.id = 'projectile-debug';
+      Object.assign(debugEl.style, {
+        position: 'fixed',
+        top: '60px',
+        left: '10px',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontFamily: 'monospace',
+        fontSize: '12px',
+        zIndex: '1000'
+      });
+      document.body.appendChild(debugEl);
+      
+      // Update debug info periodically
+      setInterval(function() {
+        const activeCount = this.active.filter(active => active).length;
+        debugEl.textContent = `Projectiles: ${activeCount}/${this.data.maxProjectiles}`;
+      }.bind(this), 500);
+    },
+    
+    onMouseDown: function(event) {
+      // Only fire on left click
+      if (event.button === 0) {
+        this.fireProjectile();
+      }
+    },
+    
+    onTouchStart: function(event) {
+      // Don't process if there's no event or if it's disabled
+      if (!event || !this.data.enabled) return;
+      
+      // Get the touch
+      const touch = event.touches[0];
+      if (!touch) return;
+      
+      // Check if this is a tap on a UI element - don't fire projectiles when interacting with UI
+      if (this.isTouchingUIElement(touch)) {
+        return;
+      }
+      
+      // Fire projectile on tap
+      this.fireProjectile();
+    },
+    
+    isTouchingUIElement: function(touch) {
+      // Get the element being touched
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (!element) return false;
+      
+      // List of CSS selectors for UI elements to ignore
+      const uiSelectors = [
+        '.move-toggle-btn',   // Walk button
+        '.menu-toggle-btn',   // Menu button
+        '.music-toggle-btn',  // Music toggle
+        '#welcome-message',   // Welcome message
+        'button',             // Any button
+        '.a-enter-vr',        // VR button
+        '#npc-stats',         // NPC stats panel
+        '#projectile-debug',  // Projectile debug panel
+        '#collectibles-hud',  // Collectibles HUD
+        '#connection-status'  // Connection status
+      ];
+      
+      // Check if the touched element or any of its parents match the UI selectors
+      let current = element;
+      while (current) {
+        // Check all selectors
+        for (const selector of uiSelectors) {
+          if (current.matches && current.matches(selector)) {
+            return true;
+          }
+        }
+        // Move up to parent
+        current = current.parentElement;
+      }
+      
+      return false;
+    },
+    
+    checkHeadTilt: function() {
+      // Only check if we have the necessary elements
+      if (!document.querySelector('#cam')) return;
+      
+      // Get the camera rotation
+      const rotation = document.querySelector('#cam').object3D.rotation;
+      const roll = rotation.z;
+      
+      // Check if head is tilted to the right (using similar values as a-loco.js)
+      const RminZ = -0.3;
+      const RmaxZ = -0.5;
+      
+      if (roll < RminZ && roll > RmaxZ) {
+        // Fire projectile on head tilt
+        this.fireProjectile();
+      }
     },
     
     fireProjectile: function() {
@@ -211,6 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
       this.startTimes[instanceIndex] = now;
       this.lastPositions[instanceIndex].copy(startPosition);
       
+      // Reset impact state
+      this.impacted[instanceIndex] = false;
+      
       // Set initial matrix
       this.dummy.position.copy(startPosition);
       this.dummy.updateMatrix();
@@ -223,86 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Simple feedback
       this.playFireSound();
-    },
-    
-    checkHeadTilt: function() {
-      // Only check if we have the necessary elements
-      if (!document.querySelector('#cam')) return;
-      
-      // Get the camera rotation
-      const rotation = document.querySelector('#cam').object3D.rotation;
-      const roll = rotation.z;
-      
-      // Check if head is tilted to the right (using similar values as a-loco.js)
-      const RminZ = -0.3;
-      const RmaxZ = -0.5;
-      
-      if (roll < RminZ && roll > RmaxZ) {
-        // Fire projectile on head tilt
-        this.fireProjectile();
-      }
-    },
-    
-    onMouseDown: function(event) {
-      // Only fire on left click
-      if (event.button === 0) {
-        this.fireProjectile();
-      }
-    },
-    
-    playFireSound: function() {
-      // Simple visual feedback if sound not available
-      document.body.style.backgroundColor = '#003366';
-      setTimeout(() => {
-        document.body.style.backgroundColor = '';
-      }, 50);
-    },
-    
-    createHitEffect: function(position) {
-      // Create a simple hit effect (flash sphere)
-      const hitEffect = document.createElement('a-sphere');
-      hitEffect.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
-      hitEffect.setAttribute('radius', '1');
-      hitEffect.setAttribute('color', '#FFFFFF');
-      hitEffect.setAttribute('material', 'shader: flat; transparent: true; opacity: 0.6');
-      
-      document.querySelector('a-scene').appendChild(hitEffect);
-      
-      // Animate and remove
-      let scale = 1.0;
-      const interval = setInterval(() => {
-        scale += 0.5;
-        hitEffect.setAttribute('scale', `${scale} ${scale} ${scale}`);
-        hitEffect.setAttribute('material', 'opacity', 0.6 - scale * 0.1);
-        
-        if (scale >= 5) {
-          clearInterval(interval);
-          if (hitEffect.parentNode) {
-            hitEffect.parentNode.removeChild(hitEffect);
-          }
-        }
-      }, 50);
-    },
-    
-    applyPushForce: function(entity, direction, force) {
-      // Apply push force to an entity
-      const aiComponent = entity.components['ai-locomotion'];
-      
-      if (aiComponent) {
-        // Get entity position
-        const position = entity.object3D.position;
-        
-        // Apply force in direction of projectile
-        const pushX = direction.x * force;
-        const pushZ = direction.z * force;
-        
-        // Update position
-        position.x += pushX;
-        position.z += pushZ;
-        
-        // Create hit effect
-        this.createHitEffect(position);
-      }
     },
     
     checkCollisions: function(instanceIndex, oldPos, newPos) {
@@ -359,6 +423,61 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       return false;
+    },
+    
+    applyPushForce: function(entity, direction, force) {
+      // Apply push force to an entity
+      const aiComponent = entity.components['ai-locomotion'];
+      
+      if (aiComponent) {
+        // Get entity position
+        const position = entity.object3D.position;
+        
+        // Apply force in direction of projectile
+        const pushX = direction.x * force;
+        const pushZ = direction.z * force;
+        
+        // Update position
+        position.x += pushX;
+        position.z += pushZ;
+        
+        // Create hit effect
+        this.createHitEffect(position);
+      }
+    },
+    
+    createHitEffect: function(position) {
+      // Create a simple hit effect (flash sphere)
+      const hitEffect = document.createElement('a-sphere');
+      hitEffect.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
+      hitEffect.setAttribute('radius', '1');
+      hitEffect.setAttribute('color', '#FFFFFF');
+      hitEffect.setAttribute('material', 'shader: flat; transparent: true; opacity: 0.6');
+      
+      document.querySelector('a-scene').appendChild(hitEffect);
+      
+      // Animate and remove
+      let scale = 1.0;
+      const interval = setInterval(function() {
+        scale += 0.5;
+        hitEffect.setAttribute('scale', `${scale} ${scale} ${scale}`);
+        hitEffect.setAttribute('material', 'opacity', 0.6 - scale * 0.1);
+        
+        if (scale >= 5) {
+          clearInterval(interval);
+          if (hitEffect.parentNode) {
+            hitEffect.parentNode.removeChild(hitEffect);
+          }
+        }
+      }, 50);
+    },
+    
+    playFireSound: function() {
+      // Simple visual feedback if sound not available
+      document.body.style.backgroundColor = '#003366';
+      setTimeout(function() {
+        document.body.style.backgroundColor = '';
+      }, 50);
     },
     
     tick: function(time, deltaTime) {
@@ -477,6 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
     remove: function() {
       // Clean up event listeners
       document.removeEventListener('mousedown', this.onMouseDown);
+      document.removeEventListener('touchstart', this.onTouchStart);
       
       // Clear interval
       if (this.checkInterval) {
@@ -495,6 +615,11 @@ document.addEventListener('DOMContentLoaded', () => {
         this.el.object3D.remove(this.trailMesh);
         this.trailGeometry.dispose();
         this.trailMaterial.dispose();
+      }
+      
+      // Remove fire button if it exists
+      if (this.fireButton && this.fireButton.parentNode) {
+        this.fireButton.parentNode.removeChild(this.fireButton);
       }
       
       // Remove debug UI

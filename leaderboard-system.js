@@ -29,7 +29,7 @@ function createLeaderboardButton() {
   // Style the button
   Object.assign(toggleButton.style, {
     position: 'fixed',
-    top: '80px',
+    top: '120px',
     right: '10px',
     width: '40px',
     height: '40px',
