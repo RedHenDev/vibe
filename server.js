@@ -88,13 +88,14 @@ wss.on('connection', (ws) => {
                     // Assign a unique name (either requested or generated)
                     playerName = generateUniqueName(data.name);
                     
-                    // Add new player with all data
+                    // Add new player with all data, including score
                     players[playerId] = {
                         position: data.position,
                         rotation: data.rotation || { x: 0, y: 0, z: 0 },
                         color: data.color,
                         model: data.model,
-                        name: playerName
+                        name: playerName,
+                        score: 0 // Initialize score to 0
                     };
                     
                     // Send the player ID and name
@@ -141,6 +142,27 @@ wss.on('connection', (ws) => {
                         broadcastToAll({
                             type: 'players',
                             players: players
+                        });
+                    }
+                    break;
+                
+                case 'playerScore':
+                    // Update player's score
+                    if (players[playerId]) {
+                        players[playerId].score = data.score;
+                        
+                        // Broadcast updated players with scores
+                        broadcastToAll({
+                            type: 'players',
+                            players: players
+                        });
+                        
+                        // Also send a specific score update message
+                        broadcastToAll({
+                            type: 'playerScore',
+                            id: playerId,
+                            name: players[playerId].name,
+                            score: data.score
                         });
                     }
                     break;
