@@ -33,7 +33,7 @@ triage
 
 1- -dev projectile pulse (light kick to other players and npcs)
 
-2- -dev leaderboard vibes (distance travelled?)
+2- 
 
 3- -dev woods in only certain areas; option to decide manually as well as 'background' deployment of wooded areas from world seed.
 
@@ -46,6 +46,21 @@ ad como key
 -refac = something to refactor
 
 to do
+
+-f cublit's steal vibes for energy (descend over top of client's head)
+
+-sync projectiles and npcs and collectibles
+
+-refac vibes worth 5; rings 1; karpathy crystals 1;
+
+-refac vibes different blue, or black; rings smaller
+-f sonic rings generate in 'runs'
+
+-f glasts swarm view (no harm)
+
+-f sync day and night mode.
+
+-f countdown indicator till next night time...
 
 -b vibes specials need to accumulate time, not reset due to set timeout from first vibe collected
 
@@ -66,6 +81,8 @@ to do
 -f rain
 
 -b night and day mode npcs -- with correct swarming of clients
+
+DONE-dev leaderboard vibes (distance travelled?)
 
 DONE-refac simplified collectibles (plus sounds/textures)
 
