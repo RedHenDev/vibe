@@ -33,7 +33,7 @@ triage
 
 1- -dev projectile pulse (light kick to other players and npcs)
 
-2- 
+2- -refac fix NPC deployment for night-mode
 
 3- -dev woods in only certain areas; option to decide manually as well as 'background' deployment of wooded areas from world seed.
 
@@ -46,6 +46,18 @@ ad como key
 -refac = something to refactor
 
 to do
+
+-f 2d map showing locations of all clients; dynamically zoom out to fit all in? Or, allow client to zoom as they wish.
+
+-b fuse fix for when on mobile. Seems to remain on.
+
+-refac vibes panel should look like menu button -- bevelled
+
+-f vibehouse portal
+
+-refac move vibeverse portal to top of mountain near spawn, and hide until client has collected 64 vibes.
+
+-f instructions about vibes and portal and vibearcade on welcome message
 
 -f cublit's steal vibes for energy (descend over top of client's head)
 
