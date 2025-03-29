@@ -45,10 +45,10 @@ const mathConcepts = [
     'Logic', 'Set', 'Graph', 'Dimension'
 ];
 
-// Game state
-let socket;
-let playerId;
-window.playerName; // Store our player's name
+// Game state - FIXED: Made socket and playerId global with window prefix
+window.socket = null;
+window.playerId = null;
+window.playerName = null; // Store our player's name
 let remotePlayers = {};
 
 // Make player count globally accessible for a-loco.js
@@ -73,11 +73,11 @@ function generateMathName() {
 // Connect to the WebSocket server
 function connectToServer() {
     try {
-        socket = new WebSocket(config.websocketUrl);
+        window.socket = new WebSocket(config.websocketUrl); // FIXED: Use window.socket
         
-        socket.onopen = () => {
+        window.socket.onopen = () => {
             // Generate a name for our player
-            playerName = generateMathName();
+            window.playerName = generateMathName(); // FIXED: Explicitly set window.playerName
             
             document.getElementById('connection-status').textContent = 'Connection status: Connecting...';
             
@@ -89,7 +89,7 @@ function connectToServer() {
                 const camera = document.querySelector('#cam');
                 const rotation = camera.object3D.rotation;
                 
-                socket.send(JSON.stringify({
+                window.socket.send(JSON.stringify({
                     type: 'join',
                     position: {
                         x: position.x,
@@ -103,27 +103,27 @@ function connectToServer() {
                     },
                     color: getRandomColor(),
                     model: getRandomModel(),
-                    name: playerName
+                    name: window.playerName
                 }));
             }, 1000);
         };
         
-        socket.onmessage = (event) => {
+        window.socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
             
             switch (message.type) {
                 case 'id':
-                    playerId = message.id;
-                    console.log(`Connected with ID: ${playerId}, Name: ${message.name}`);
+                    window.playerId = message.id; // FIXED: Set global playerId
+                    console.log(`Connected with ID: ${window.playerId}, Name: ${message.name}`);
                     
                     // If server assigned a different name, update our local name
-                    if (message.name && message.name !== playerName) {
-                        playerName = message.name;
+                    if (message.name && message.name !== window.playerName) {
+                        window.playerName = message.name;
                     }
                     
                     // Update connection status with player name
                     document.getElementById('connection-status').textContent = 
-                        `Connected as: ${playerName} (${message.playerCount} player${message.playerCount !== 1 ? 's' : ''} online)`;
+                        `Connected as: ${window.playerName} (${message.playerCount} player${message.playerCount !== 1 ? 's' : ''} online)`;
                     break;
                     
                 case 'players':
@@ -141,12 +141,12 @@ function connectToServer() {
                     
                 case 'playerCount':
                     document.getElementById('connection-status').textContent = 
-                        `Connected as: ${playerName} (${message.count} player${message.count !== 1 ? 's' : ''} online)`;
+                        `Connected as: ${window.playerName} (${message.count} player${message.count !== 1 ? 's' : ''} online)`;
                     break;
             }
         };
         
-        socket.onclose = () => {
+        window.socket.onclose = () => {
             document.getElementById('connection-status').textContent = 'Connection status: Disconnected';
             console.log('Connection closed');
             
@@ -154,7 +154,7 @@ function connectToServer() {
             setTimeout(connectToServer, 5000);
         };
         
-        socket.onerror = (error) => {
+        window.socket.onerror = (error) => {
             console.error('WebSocket error:', error);
         };
     } catch (error) {
@@ -173,7 +173,7 @@ function getRandomModel() {
 
 // Sync local player position with server
 function syncPlayerPosition() {
-    if (!socket || socket.readyState !== WebSocket.OPEN || !playerId) {
+    if (!window.socket || window.socket.readyState !== WebSocket.OPEN || !window.playerId) {
         return;
     }
     
@@ -185,7 +185,7 @@ function syncPlayerPosition() {
     const rotation = camera.object3D.rotation;
     
     // Send updated position and rotation to server
-    socket.send(JSON.stringify({
+    window.socket.send(JSON.stringify({
         type: 'update',
         position: {
             x: position.x,
@@ -222,7 +222,7 @@ function updatePlayers(playerData) {
     // Update existing players and add new ones
     for (const id in playerData) {
         // Skip our own player - we'll handle that separately
-        if (id === playerId) continue;
+        if (id === window.playerId) continue;
         
         const data = playerData[id];
         

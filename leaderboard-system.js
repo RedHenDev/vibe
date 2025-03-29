@@ -95,13 +95,15 @@ function toggleLeaderboard() {
 // Main leaderboard manager component
 AFRAME.registerComponent('leaderboard-manager', {
   schema: {
-    refreshInterval: { type: 'number', default: 2000 } // Refresh every 2 seconds
+    refreshInterval: { type: 'number', default: 1000 }, // Refresh every 1 second (more frequent)
+    debug: { type: 'boolean', default: true }           // Enable debug output
   },
   
   init: function() {
     // Player score data
     this.playerScores = new Map();
     this.localScore = 0; // Track local player's score
+    this.debugLog("Leaderboard manager initializing");
     
     // Create leaderboard panel
     this.createLeaderboard();
@@ -118,22 +120,88 @@ AFRAME.registerComponent('leaderboard-manager', {
     // Listen for score changes from vibes-manager
     this.listenForScoreChanges();
     
-    console.log("Leaderboard manager initialized and connected to WebSocket");
+    // Add local player to leaderboard immediately if player ID exists
+    this.initializeLocalPlayer();
+    
+    // Set a flag to force initial update 
+    this.needsInitialUpdate = true;
+    
+    this.debugLog("Leaderboard manager initialized and connected to WebSocket");
+  },
+  
+  debugLog: function(message, data) {
+    if (this.data.debug) {
+      if (data) {
+        console.log(`[Leaderboard] ${message}`, data);
+      } else {
+        console.log(`[Leaderboard] ${message}`);
+      }
+    }
   },
   
   tick: function(time) {
-    // Update leaderboard periodically
-    if (time - this.lastRefresh > this.data.refreshInterval) {
+    // Update leaderboard on specific intervals
+    if (time - this.lastRefresh > this.data.refreshInterval || this.needsInitialUpdate) {
       this.lastRefresh = time;
-      this.updateLeaderboard();
+      this.needsInitialUpdate = false;
+      
+      // Check if we need to initialize local player again (in case playerId now exists)
+      if (window.playerId && !this.playerScores.has(window.playerId)) {
+        this.initializeLocalPlayer();
+      }
       
       // Check if local score has changed, if so, send update to server
       const currentScore = this.getLocalPlayerScore();
       if (currentScore !== this.localScore) {
+        this.debugLog(`Local score changed from ${this.localScore} to ${currentScore}`);
         this.localScore = currentScore;
         this.sendScoreUpdate();
-        console.log("Local score changed, sent update to server:", this.localScore);
       }
+      
+      // Always update the leaderboard to catch any missed updates
+      this.updateLeaderboard();
+    }
+  },
+  
+  // Improved initializeLocalPlayer method for the leaderboard-system.js file
+
+initializeLocalPlayer: function() {
+  // More thorough check for player identification
+  if (window.playerId && window.playerName) {
+    this.debugLog(`Initializing local player: ${window.playerName} (${window.playerId})`);
+    
+    // Get current score
+    const score = this.getLocalPlayerScore();
+    
+    // Add to player scores
+    this.playerScores.set(window.playerId, {
+      name: window.playerName,
+      score: score,
+      isLocal: true
+    });
+    
+    // Update leaderboard UI
+    this.updateLeaderboard();
+    
+    // Send score update to server (with a delay to ensure connection is ready)
+    setTimeout(() => this.sendScoreUpdate(), 1000);
+    
+    return true; // Successfully initialized
+  } else {
+    // Log what variables are missing to help with debugging
+    const missingVars = [];
+    if (!window.playerId) missingVars.push('playerId');
+    if (!window.playerName) missingVars.push('playerName');
+    
+    this.debugLog(`Cannot initialize local player - missing: ${missingVars.join(', ')}`);
+    
+    // If we have player name but no ID, try to force a socket update to get the ID
+    if (window.playerName && !window.playerId && window.socket && window.socket.readyState === WebSocket.OPEN) {
+      this.debugLog("Have playerName but no playerId - forcing socket update");
+      this.sendForcedUpdate();
+    }
+    
+    return false; // Failed to initialize
     }
   },
   
@@ -171,6 +239,19 @@ AFRAME.registerComponent('leaderboard-manager', {
       fontSize: '18px'
     });
     leaderboard.appendChild(title);
+    
+    // Add connection status indicator
+    const statusElem = document.createElement('div');
+    statusElem.id = 'leaderboard-status';
+    statusElem.textContent = 'Connecting...';
+    Object.assign(statusElem.style, {
+      textAlign: 'center',
+      fontSize: '12px',
+      fontStyle: 'italic',
+      marginBottom: '10px',
+      color: '#AAAAAA'
+    });
+    leaderboard.appendChild(statusElem);
     
     // Create scores container
     const scoresContainer = document.createElement('div');
@@ -226,81 +307,177 @@ AFRAME.registerComponent('leaderboard-manager', {
     window.WebSocket.CLOSED = originalWebSocket.CLOSED;
   },
   
-  attachSocketHandlers: function() {
-    if (!window.socket || window.socket.leaderboardHandlersAttached) return;
+  // This is the fixed attachSocketHandlers method for the leaderboard-system.js file
+
+attachSocketHandlers: function() {
+  // Check more thoroughly for the socket availability and avoid re-attaching
+  if (!window.socket || window.socket.leaderboardHandlersAttached) return;
+  
+  const self = this;
+  this.debugLog("Attaching leaderboard handlers to socket");
+  
+  // Update UI status
+  const statusElem = document.getElementById('leaderboard-status');
+  if (statusElem) {
+    statusElem.textContent = 'Connected to server';
+    statusElem.style.color = '#66FF66';
+  }
+  
+  // Store the original message handler
+  const originalOnMessage = window.socket.onmessage;
+  
+  // Replace with our handler that still calls the original
+  window.socket.onmessage = function(event) {
+    // Call the original handler
+    if (originalOnMessage) {
+      originalOnMessage.call(this, event);
+    }
     
-    const self = this;
-    console.log("Attaching leaderboard handlers to socket");
-    
-    // Store the original message handler
-    const originalOnMessage = window.socket.onmessage;
-    
-    // Replace with our handler that still calls the original
-    window.socket.onmessage = function(event) {
-      // Call the original handler
-      if (originalOnMessage) {
-        originalOnMessage.call(this, event);
-      }
+    // Add our handler
+    try {
+      const message = JSON.parse(event.data);
       
-      // Add our handler
-      try {
-        const message = JSON.parse(event.data);
-        
-        // Process different message types
-        switch (message.type) {
-          case 'players':
-            self.processPlayersUpdate(message.players);
-            break;
-            
-          case 'playerScore':
-            self.updatePlayerScore(message.id, message.score, message.name);
-            break;
-            
-          case 'join':
-            // A new player joined, refresh the leaderboard soon
-            setTimeout(() => self.updateLeaderboard(), 500);
-            break;
-            
-          case 'leave':
-            // A player left, remove them from scores and refresh
-            if (self.playerScores.has(message.id)) {
-              self.playerScores.delete(message.id);
-              self.updateLeaderboard();
-            }
-            break;
-        }
-      } catch (e) {
-        console.error('Error in leaderboard WebSocket handler:', e);
+      // Process different message types
+      switch (message.type) {
+        case 'id':
+          // Make sure we check that window.playerId is set here
+          self.debugLog(`Received player ID: ${message.id}, name: ${message.name}`);
+          
+          // Ensure our global variables are set correctly
+          if (!window.playerId && message.id) {
+            window.playerId = message.id;
+          }
+          
+          if (!window.playerName && message.name) {
+            window.playerName = message.name;
+          }
+          
+          // Now initialize after ensuring variables are set
+          self.initializeLocalPlayer();
+          break;
+          
+        case 'players':
+          self.debugLog("Received players update", message.players);
+          self.processPlayersUpdate(message.players);
+          break;
+          
+        case 'playerScore':
+          self.debugLog(`Received player score update: ID ${message.id}, score ${message.score}`);
+          self.updatePlayerScore(message.id, message.score, message.name);
+          break;
+          
+        case 'join':
+          // A new player joined, refresh the leaderboard soon
+          self.debugLog(`Player joined: ${message.id} (${message.name || 'Unknown'})`);
+          setTimeout(() => self.updateLeaderboard(), 500);
+          break;
+          
+        case 'leave':
+          // A player left, remove them from scores and refresh
+          self.debugLog(`Player left: ${message.id} (${message.name || 'Unknown'})`);
+          if (self.playerScores.has(message.id)) {
+            self.playerScores.delete(message.id);
+            self.updateLeaderboard();
+          }
+          break;
       }
-    };
+    } catch (e) {
+      console.error('Error in leaderboard WebSocket handler:', e);
+    }
+  };
+  
+  // Set handler for socket close
+  const originalOnClose = window.socket.onclose;
+  window.socket.onclose = function(event) {
+    if (originalOnClose) {
+      originalOnClose.call(this, event);
+    }
     
-    // Mark that we've attached handlers to avoid doing it twice
-    window.socket.leaderboardHandlersAttached = true;
+    // Update UI status
+    const statusElem = document.getElementById('leaderboard-status');
+    if (statusElem) {
+      statusElem.textContent = 'Disconnected from server';
+      statusElem.style.color = '#FF6666';
+    }
     
-    // Send initial score update to make sure server has our latest score
-    setTimeout(() => self.sendScoreUpdate(), 1000);
+    self.debugLog("WebSocket connection closed");
+  };
+  
+  // Mark that we've attached handlers to avoid doing it twice
+  window.socket.leaderboardHandlersAttached = true;
+  
+  // Request players list to make sure we're up to date
+  if (window.socket.readyState === WebSocket.OPEN) {
+    // We can't directly request this, but we can force a position update
+    // which will cause the server to send a full players list
+    self.sendForcedUpdate();
+  }
+  
+  this.debugLog("Leaderboard WebSocket handlers initialized");
+},
+  
+  sendForcedUpdate: function() {
+    // Force a position update to trigger server to send latest player data
+    if (!window.socket || window.socket.readyState !== WebSocket.OPEN) return;
     
-    console.log("Leaderboard WebSocket handlers initialized");
+    const playerEntity = document.querySelector('#player');
+    if (!playerEntity) return;
+    
+    const position = playerEntity.getAttribute('position');
+    const camera = document.querySelector('#cam');
+    if (!camera) return;
+    
+    const rotation = camera.object3D.rotation;
+    
+    window.socket.send(JSON.stringify({
+      type: 'update',
+      position: {
+        x: position.x,
+        y: position.y,
+        z: position.z
+      },
+      rotation: {
+        x: -rotation.x,
+        y: rotation.y+3.14, 
+        z: rotation.z
+      }
+    }));
+    
+    this.debugLog("Sent forced position update to get latest player data");
   },
   
   processPlayersUpdate: function(players) {
+    if (!players) return;
+    
     // Process the full players object from server
+    let updatedAny = false;
+    
     for (const id in players) {
       const player = players[id];
       
-      // Check if this player has a score
-      if (player.score !== undefined) {
-        // Add or update player in our scores map
+      // Check if this is a new player or updated score
+      const existing = this.playerScores.get(id);
+      const isLocal = id === window.playerId;
+      
+      // Only update if there's a change
+      if (!existing || 
+          existing.score !== player.score || 
+          existing.name !== player.name) {
+        
         this.playerScores.set(id, {
           name: player.name || 'Unknown Player',
           score: player.score || 0,
-          isLocal: id === window.playerId
+          isLocal: isLocal
         });
+        
+        updatedAny = true;
       }
     }
     
-    // Update the leaderboard display
-    this.updateLeaderboard();
+    // Update the leaderboard display if anything changed
+    if (updatedAny) {
+      this.updateLeaderboard();
+    }
   },
   
   updatePlayerScore: function(id, score, name) {
@@ -314,12 +491,15 @@ AFRAME.registerComponent('leaderboard-manager', {
       isLocal: id === window.playerId
     };
     
-    // Update the score
-    playerData.score = score;
-    this.playerScores.set(id, playerData);
-    
-    // Update the leaderboard
-    this.updateLeaderboard();
+    // Only update if score has changed
+    if (playerData.score !== score) {
+      // Update the score
+      playerData.score = score;
+      this.playerScores.set(id, playerData);
+      
+      // Update the leaderboard
+      this.updateLeaderboard();
+    }
   },
   
   listenForScoreChanges: function() {
@@ -327,6 +507,7 @@ AFRAME.registerComponent('leaderboard-manager', {
     document.addEventListener('score-updated', (event) => {
       if (event.detail && typeof event.detail.score === 'number') {
         // Update our local score tracker
+        this.debugLog(`Received score-updated event: ${event.detail.score}`);
         this.localScore = event.detail.score;
         // Send update to server
         this.sendScoreUpdate();
@@ -343,12 +524,17 @@ AFRAME.registerComponent('leaderboard-manager', {
         
         // Now send the updated score to server
         if (stats && typeof stats.points === 'number') {
+          this.debugLog(`collectiblesManager.recordCollection called, points: ${stats.points}`);
           this.localScore = stats.points;
           this.sendScoreUpdate();
         }
         
         return stats;
       };
+      
+      this.debugLog("Overrode collectiblesManager.recordCollection");
+    } else {
+      this.debugLog("Warning: collectiblesManager not available for score change detection");
     }
   },
   
@@ -402,6 +588,7 @@ AFRAME.registerComponent('leaderboard-manager', {
   sendScoreUpdate: function() {
     // Don't send if socket isn't ready
     if (!window.socket || window.socket.readyState !== WebSocket.OPEN || !window.playerId) {
+      this.debugLog("Cannot send score update - socket not ready or playerId missing");
       return;
     }
     
@@ -419,7 +606,7 @@ AFRAME.registerComponent('leaderboard-manager', {
       score: score
     }));
     
-    console.log(`Sent score update to server: ${score}`);
+    this.debugLog(`Sent score update to server: ${score}`);
   },
   
   updateLeaderboard: function() {
@@ -429,10 +616,21 @@ AFRAME.registerComponent('leaderboard-manager', {
     // Clear current scores
     scoresContainer.innerHTML = '';
     
+    // Get the player count
+    const playerCount = this.playerScores.size;
+    
+    // Update the status with player count
+    const statusElem = document.getElementById('leaderboard-status');
+    if (statusElem) {
+      statusElem.textContent = `Connected to server (${playerCount} player${playerCount !== 1 ? 's' : ''})`;
+    }
+    
     // Convert to array and sort by score (highest first)
     const sortedPlayers = Array.from(this.playerScores.entries())
       .map(([id, data]) => ({ id, ...data }))
       .sort((a, b) => b.score - a.score);
+    
+    this.debugLog(`Updating leaderboard with ${sortedPlayers.length} players`);
     
     // Add players to leaderboard
     sortedPlayers.forEach((player, index) => {
@@ -485,6 +683,26 @@ AFRAME.registerComponent('leaderboard-manager', {
         color: '#AAA'
       });
       scoresContainer.appendChild(noPlayers);
+      
+      // Also add a debug message to help troubleshoot
+      if (this.data.debug) {
+        const debugMessage = document.createElement('div');
+        debugMessage.innerHTML = 'Debug info:<br>' +
+          `Player ID: ${window.playerId || 'Missing'}<br>` +
+          `Player name: ${window.playerName || 'Missing'}<br>` +
+          `Socket connected: ${window.socket && window.socket.readyState === WebSocket.OPEN ? 'Yes' : 'No'}`;
+        
+        Object.assign(debugMessage.style, {
+          marginTop: '10px',
+          fontSize: '11px',
+          color: '#AAA',
+          textAlign: 'left',
+          padding: '5px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.2)'
+        });
+        
+        scoresContainer.appendChild(debugMessage);
+      }
     }
   }
 });
