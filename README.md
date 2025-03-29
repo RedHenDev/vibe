@@ -28,6 +28,7 @@ CONTROLS:
 - Shift to toggle run
 - m to toggle music
 - p next track
+- l leaderboard
 
 triage
 
@@ -35,7 +36,7 @@ triage
 
 2- -refac fix NPC deployment for night-mode
 
-3- -f sync day and night mode.
+3- -f sync day and night mode across clients.
 
 ad como key
 
@@ -46,6 +47,10 @@ ad como key
 -refac = something to refactor
 
 to do
+
+i- opening interior start for spawn. Leads to the spectacular view of the procedural terrain. But how to integrate with randomized spawn points at start? Perhaps the interior is a local, private hallucination, if you will?
+
+b- reduce number of times leaderboard updated?
 
 i- perhaps lore and deeper game narrative revealed by NPCs and, or, artefacts found on the terrain -- perhaps map gives clue to this, revealing a log of e.g. 0/10 secrets found or something? Or a log of narrative fragments.
 
@@ -61,7 +66,7 @@ i- take locomotive fun as a key, perhaps secondary mechanic of the game, esp. si
 
 -f vibehouse portal
 
--refac move vibeverse portal to top of mountain near spawn, and hide until client has collected 64 vibes.
+-refac move vibeverse portal to top of mountain near spawn, and hide until client has collected 64 vibes. OK -- not hide, but lock, Quake style, until client has collected the 64 vibes.
 
 -f instructions about vibes and portal and vibeHouse on welcome message
 

@@ -132,9 +132,9 @@ AFRAME.registerComponent('leaderboard-manager', {
   debugLog: function(message, data) {
     if (this.data.debug) {
       if (data) {
-        console.log(`[Leaderboard] ${message}`, data);
+        // console.log(`[Leaderboard] ${message}`, data);
       } else {
-        console.log(`[Leaderboard] ${message}`);
+        // console.log(`[Leaderboard] ${message}`);
       }
     }
   },
@@ -606,7 +606,7 @@ attachSocketHandlers: function() {
       score: score
     }));
     
-    this.debugLog(`Sent score update to server: ${score}`);
+    //this.debugLog(`Sent score update to server: ${score}`);
   },
   
   updateLeaderboard: function() {
@@ -630,7 +630,7 @@ attachSocketHandlers: function() {
       .map(([id, data]) => ({ id, ...data }))
       .sort((a, b) => b.score - a.score);
     
-    this.debugLog(`Updating leaderboard with ${sortedPlayers.length} players`);
+    //this.debugLog(`Updating leaderboard with ${sortedPlayers.length} players`);
     
     // Add players to leaderboard
     sortedPlayers.forEach((player, index) => {

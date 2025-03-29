@@ -45,7 +45,7 @@ AFRAME.registerComponent('portal-system', {
     exitPortal.setAttribute('id', 'exit-portal');
     
     // Position the portal in the world
-    exitPortal.setAttribute('position', '-200 30 -300');
+    exitPortal.setAttribute('position', '-95 55 -19');
     
     // Create visible portal ring (torus)
     const portalRing = document.createElement('a-torus');
@@ -87,11 +87,11 @@ AFRAME.registerComponent('portal-system', {
     startPortal.setAttribute('id', 'start-portal');
     
     // Position near player spawn
-    startPortal.setAttribute('position', '10 10 -10');
+    startPortal.setAttribute('position', '10 42 -10');
     
     // Create visible portal ring (torus)
     const portalRing = document.createElement('a-torus');
-    portalRing.setAttribute('color', '#ff0000');
+    portalRing.setAttribute('color', '#000000');
     portalRing.setAttribute('radius', '15');
     portalRing.setAttribute('radius-tubular', '2');
     portalRing.setAttribute('segments-tubular', '32');
@@ -155,7 +155,7 @@ AFRAME.registerComponent('portal-system', {
       const distanceToExit = this.calculateDistance(playerPos, exitPortalPos);
       
       // If player is close to exit portal
-      if (distanceToExit < 30) {
+      if (distanceToExit < 15) {
         this.enterExitPortal();
       }
     }
@@ -166,7 +166,7 @@ AFRAME.registerComponent('portal-system', {
       const distanceToStart = this.calculateDistance(playerPos, startPortalPos);
       
       // If player is close to start portal
-      if (distanceToStart < 20) {
+      if (distanceToStart < 15) {
         this.enterStartPortal();
       }
     }
