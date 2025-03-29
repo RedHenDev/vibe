@@ -238,7 +238,8 @@ window.COLLECTIBLE_TYPES = {
       if (terrainMovement) {
         // Enable flight mode
         terrainMovement.flying = true;
-        playerEl.object3D.position.y += 12;
+        //playerEl.object3D.position.y += 12;
+        
         // Initial small boost for immediate feedback
         //playerEl.object3D.position.y += 5;
         /*

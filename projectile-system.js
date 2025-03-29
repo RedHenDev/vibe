@@ -20,12 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
       maxProjectiles: { type: 'number', default: 50 },       // Maximum number of projectiles
       projectileSpeed: { type: 'number', default: 90 },      // Speed of projectiles
       projectileLifetime: { type: 'number', default: 2000 }, // How long projectiles live (ms)
-      impactLifetime: { type: 'number', default: 2000 },     // How long projectiles remain after impact (ms)
+      impactLifetime: { type: 'number', default: 0 },     // How long projectiles remain after impact (ms)
       cooldown: { type: 'number', default: 200 },            // Cooldown between shots (ms)
       pushForce: { type: 'number', default: 5 },             // Force applied when hitting targets
       projectileColor: { type: 'color', default: '#00CCFF' }, // Icy blue projectile color
       projectileSize: { type: 'number', default: 0.5 },      // Size of projectiles
-      trailEnabled: { type: 'boolean', default: true },      // Enable trail effects
+      trailEnabled: { type: 'boolean', default: false },      // Enable trail effects
       showFireButton: { type: 'boolean', default: true },    // Show fire button on mobile
       debug: { type: 'boolean', default: false },             // Show debug info
       enabled: { type: 'boolean', default: true }            // Enable/disable the system
@@ -95,9 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Create material with icy blue color
       const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color('#00CCFF'),
+        color: new THREE.Color(this.data.projectileColor),
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.4,
         side: THREE.DoubleSide
       });
       
@@ -339,8 +339,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const roll = rotation.z;
       
       // Check if head is tilted to the right (using similar values as a-loco.js)
-      const RminZ = -0.3;
-      const RmaxZ = -0.5;
+      const RminZ = -0.15;
+      const RmaxZ = -0.29;
       
       if (roll < RminZ && roll > RmaxZ) {
         // Fire projectile on head tilt
