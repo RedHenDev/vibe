@@ -5,16 +5,16 @@
 window.COLLECTIBLE_TYPES = {
     "vibe": {
       shape: "sphere",
-      color: "#00DDFF",
+      color: "#000000",
       scale: "3 3 3",
       glow: false,
-      points: 1,
+      points: 5,
       soundEffect: "./assets/Shoot_01.mp3" // Using the provided sound file
     },
     "ring": {
       shape: "torus",
       color: "#FFFF00",
-      scale: "2 2 2",
+      scale: "0.4 0.4 0.4",
       glow: false,
       points: 1,
       soundEffect: "./assets/sonic-coin-sound.mp3" // Using the provided sound file
@@ -24,7 +24,7 @@ window.COLLECTIBLE_TYPES = {
       color: "#FFF",
       scale: "3 3 3",
       glow: false,
-      points: 2, // Updated from 0 to 5 to match vibes-manager.js
+      points: 3, // Updated from 0 to 5 to match vibes-manager.js
       soundEffect: "./assets/Pickup_03.mp3" // Using the same sound for both types
     }
   };

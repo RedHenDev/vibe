@@ -457,20 +457,24 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Check other player collisions
       const players = document.querySelectorAll('#players > a-entity');
-      for (let i = 0; i < players.length; i++) {
-        const player = players[i];
-        if (!player.object3D) continue;
-        
-        const intersects = raycaster.intersectObject(player.object3D, true);
-        if (intersects.length > 0) {
-          // Just visual effect for other players
-          this.createHitEffect(player.object3D.position);
-          // Mark as impacted but don't deactivate immediately
-          this.impacted[instanceIndex] = true;
-          this.impactTimes[instanceIndex] = Date.now();
-          return true;
+for (let i = 0; i < players.length; i++) {
+  const player = players[i];
+  if (!player.object3D) continue;
+  
+  const intersects = raycaster.intersectObject(player.object3D, true);
+  if (intersects.length > 0) {
+    // Create visual effect
+    this.createHitEffect(player.object3D.position);
+    
+    // Apply push force to other players
+    this.applyPushToPlayer(player, direction, this.data.pushForce);
+    
+    // Mark as impacted but don't deactivate immediately
+    this.impacted[instanceIndex] = true;
+    this.impactTimes[instanceIndex] = Date.now();
+    return true;
         }
-      }
+    }
       
       return false;
     },
@@ -495,6 +499,39 @@ document.addEventListener('DOMContentLoaded', function() {
         this.createHitEffect(position);
       }
     },
+
+    applyPushToPlayer: function(playerEntity, direction, force) {
+        // Get player position
+        const position = playerEntity.object3D.position;
+        
+        // Apply force in direction of projectile
+        const pushX = direction.x * force;
+        const pushZ = direction.z * force;
+        
+        // Update position directly
+        position.x += pushX;
+        position.z += pushZ;
+        
+        // If this is a networked player, send the push via WebSocket
+        // This is optional but helps with synchronization
+        this.notifyPlayerPush(playerEntity.id, pushX, pushZ);
+      },
+
+      notifyPlayerPush: function(playerId, pushX, pushZ) {
+        // Only send if socket is available
+        if (window.socket && window.socket.readyState === WebSocket.OPEN) {
+          // Extract player ID from the entity ID (format: "player-{id}")
+          const id = playerId.replace('player-', '');
+          
+          // Send push notification
+          window.socket.send(JSON.stringify({
+            type: 'playerPush',
+            targetId: id,
+            pushX: pushX,
+            pushZ: pushZ
+          }));
+        }
+      },
     
     createHitEffect: function(position) {
       // Create a simple hit effect (flash sphere)
