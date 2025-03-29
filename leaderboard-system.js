@@ -101,6 +101,7 @@ AFRAME.registerComponent('leaderboard-manager', {
   init: function() {
     // Player score data
     this.playerScores = new Map();
+    this.localScore = 0; // Track local player's score
     
     // Create leaderboard panel
     this.createLeaderboard();
@@ -113,6 +114,11 @@ AFRAME.registerComponent('leaderboard-manager', {
     
     // Make the leaderboard manager globally available
     window.leaderboardManager = this;
+    
+    // Listen for score changes from vibes-manager
+    this.listenForScoreChanges();
+    
+    console.log("Leaderboard manager initialized and connected to WebSocket");
   },
   
   tick: function(time) {
@@ -121,8 +127,13 @@ AFRAME.registerComponent('leaderboard-manager', {
       this.lastRefresh = time;
       this.updateLeaderboard();
       
-      // Also send our current score to server
-      this.sendScoreUpdate();
+      // Check if local score has changed, if so, send update to server
+      const currentScore = this.getLocalPlayerScore();
+      if (currentScore !== this.localScore) {
+        this.localScore = currentScore;
+        this.sendScoreUpdate();
+        console.log("Local score changed, sent update to server:", this.localScore);
+      }
     }
   },
   
@@ -174,42 +185,102 @@ AFRAME.registerComponent('leaderboard-manager', {
     // We need to hook into the existing WebSocket system from game.js
     const self = this;
     
-    // Wait for WebSocket to be initialized by game.js
+    // If socket already exists and is open, set up handlers immediately
+    if (window.socket && window.socket.readyState === WebSocket.OPEN) {
+      this.attachSocketHandlers();
+    }
+    
+    // Also check periodically to catch when socket gets initialized
     const checkForSocket = setInterval(() => {
       if (window.socket && window.socket.readyState === WebSocket.OPEN) {
         clearInterval(checkForSocket);
-        
-        // Store the original message handler
-        const originalOnMessage = window.socket.onmessage;
-        
-        // Replace with our handler that still calls the original
-        window.socket.onmessage = function(event) {
-          // Call the original handler
-          if (originalOnMessage) {
-            originalOnMessage.call(this, event);
-          }
-          
-          // Add our handler
-          try {
-            const message = JSON.parse(event.data);
-            
-            // Process players message for updating scores
-            if (message.type === 'players') {
-              self.processPlayersUpdate(message.players);
-            }
-            
-            // Handle specific score updates
-            if (message.type === 'playerScore') {
-              self.updatePlayerScore(message.id, message.score, message.name);
-            }
-          } catch (e) {
-            console.error('Error in leaderboard WebSocket handler:', e);
-          }
-        };
-        
-        console.log('Leaderboard WebSocket handlers initialized');
+        this.attachSocketHandlers();
       }
     }, 500);
+    
+    // Add a backup handler for when socket is created or reconnects
+    // This ensures we catch the socket creation even if we miss it initially
+    const originalWebSocket = WebSocket;
+    window.WebSocket = function(url, protocols) {
+      const socket = new originalWebSocket(url, protocols);
+      
+      // Override the onopen method to add our handlers
+      const originalOnOpen = socket.onopen;
+      socket.onopen = function(event) {
+        if (originalOnOpen) originalOnOpen.call(this, event);
+        
+        // Small delay to ensure socket is fully initialized
+        setTimeout(() => {
+          if (this === window.socket) {
+            self.attachSocketHandlers();
+          }
+        }, 500);
+      };
+      
+      return socket;
+    };
+    window.WebSocket.prototype = originalWebSocket.prototype;
+    window.WebSocket.CONNECTING = originalWebSocket.CONNECTING;
+    window.WebSocket.OPEN = originalWebSocket.OPEN;
+    window.WebSocket.CLOSING = originalWebSocket.CLOSING;
+    window.WebSocket.CLOSED = originalWebSocket.CLOSED;
+  },
+  
+  attachSocketHandlers: function() {
+    if (!window.socket || window.socket.leaderboardHandlersAttached) return;
+    
+    const self = this;
+    console.log("Attaching leaderboard handlers to socket");
+    
+    // Store the original message handler
+    const originalOnMessage = window.socket.onmessage;
+    
+    // Replace with our handler that still calls the original
+    window.socket.onmessage = function(event) {
+      // Call the original handler
+      if (originalOnMessage) {
+        originalOnMessage.call(this, event);
+      }
+      
+      // Add our handler
+      try {
+        const message = JSON.parse(event.data);
+        
+        // Process different message types
+        switch (message.type) {
+          case 'players':
+            self.processPlayersUpdate(message.players);
+            break;
+            
+          case 'playerScore':
+            self.updatePlayerScore(message.id, message.score, message.name);
+            break;
+            
+          case 'join':
+            // A new player joined, refresh the leaderboard soon
+            setTimeout(() => self.updateLeaderboard(), 500);
+            break;
+            
+          case 'leave':
+            // A player left, remove them from scores and refresh
+            if (self.playerScores.has(message.id)) {
+              self.playerScores.delete(message.id);
+              self.updateLeaderboard();
+            }
+            break;
+        }
+      } catch (e) {
+        console.error('Error in leaderboard WebSocket handler:', e);
+      }
+    };
+    
+    // Mark that we've attached handlers to avoid doing it twice
+    window.socket.leaderboardHandlersAttached = true;
+    
+    // Send initial score update to make sure server has our latest score
+    setTimeout(() => self.sendScoreUpdate(), 1000);
+    
+    console.log("Leaderboard WebSocket handlers initialized");
   },
   
   processPlayersUpdate: function(players) {
@@ -217,25 +288,68 @@ AFRAME.registerComponent('leaderboard-manager', {
     for (const id in players) {
       const player = players[id];
       
-      // Add or update player in our scores map
-      this.playerScores.set(id, {
-        name: player.name || 'Unknown Player',
-        score: player.score || 0,
-        isLocal: id === window.playerId
-      });
+      // Check if this player has a score
+      if (player.score !== undefined) {
+        // Add or update player in our scores map
+        this.playerScores.set(id, {
+          name: player.name || 'Unknown Player',
+          score: player.score || 0,
+          isLocal: id === window.playerId
+        });
+      }
     }
+    
+    // Update the leaderboard display
+    this.updateLeaderboard();
   },
   
   updatePlayerScore: function(id, score, name) {
-    // Update a specific player's score
+    // Don't update if score is undefined
+    if (score === undefined) return;
+    
+    // Get existing player data or create new entry
     const playerData = this.playerScores.get(id) || { 
       name: name || 'Unknown Player',
       score: 0,
       isLocal: id === window.playerId
     };
     
+    // Update the score
     playerData.score = score;
     this.playerScores.set(id, playerData);
+    
+    // Update the leaderboard
+    this.updateLeaderboard();
+  },
+  
+  listenForScoreChanges: function() {
+    // Option 1: Listen for custom events from vibes-manager
+    document.addEventListener('score-updated', (event) => {
+      if (event.detail && typeof event.detail.score === 'number') {
+        // Update our local score tracker
+        this.localScore = event.detail.score;
+        // Send update to server
+        this.sendScoreUpdate();
+      }
+    });
+    
+    // Option 2: Override collectiblesManager.recordCollection to notify us
+    if (window.collectiblesManager && window.collectiblesManager.recordCollection) {
+      const originalRecordCollection = window.collectiblesManager.recordCollection;
+      
+      window.collectiblesManager.recordCollection = (type) => {
+        // Call the original function to update the score
+        const stats = originalRecordCollection(type);
+        
+        // Now send the updated score to server
+        if (stats && typeof stats.points === 'number') {
+          this.localScore = stats.points;
+          this.sendScoreUpdate();
+        }
+        
+        return stats;
+      };
+    }
   },
   
   getLocalPlayerScore: function() {
@@ -304,6 +418,8 @@ AFRAME.registerComponent('leaderboard-manager', {
       type: 'playerScore',
       score: score
     }));
+    
+    console.log(`Sent score update to server: ${score}`);
   },
   
   updateLeaderboard: function() {

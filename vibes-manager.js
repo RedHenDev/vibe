@@ -70,7 +70,8 @@ AFRAME.registerSystem('collectible-manager', {
     
     // Make the manager globally accessible
     window.collectiblesManager = {
-      recordCollection: this.recordCollection.bind(this)
+      recordCollection: this.recordCollection.bind(this),
+      getStats: this.getStats.bind(this)
     };
     
     // Set up sync system for multiplayer
@@ -257,7 +258,6 @@ AFRAME.registerSystem('collectible-manager', {
     }
   },
   
-  // This is just the updated recordCollection function
   recordCollection: function(type) {
     // Update stats
     this.stats.collected++;
@@ -278,6 +278,11 @@ AFRAME.registerSystem('collectible-manager', {
       } else {
         points = 2; // Fallback value
       }
+    } else if (type === 'ring') {
+      // Handle ring collection if needed
+      if (window.COLLECTIBLE_TYPES && window.COLLECTIBLE_TYPES.ring) {
+        points = window.COLLECTIBLE_TYPES.ring.points;
+      }
     }
     
     // Add points to total
@@ -286,6 +291,31 @@ AFRAME.registerSystem('collectible-manager', {
     // Update HUD
     this.updateHud();
     
+    // Notify leaderboard of score change - new code
+    this.notifyLeaderboard();
+    
+    return this.stats;
+  },
+  
+  // Add this new function to notify the leaderboard of score changes
+  notifyLeaderboard: function() {
+    // Method 1: Use the leaderboard manager directly if available
+    if (window.leaderboardManager && typeof window.leaderboardManager.sendScoreUpdate === 'function') {
+      window.leaderboardManager.sendScoreUpdate();
+    }
+    
+    // Method 2: Dispatch a custom event for the leaderboard to listen for
+    document.dispatchEvent(new CustomEvent('score-updated', {
+      detail: {
+        score: this.stats.points,
+        vibes: this.stats.vibes,
+        karpathys: this.stats.karpathys
+      }
+    }));
+  },
+  
+  // Add this utility method to get stats (for easier external access)
+  getStats: function() {
     return this.stats;
   },
   

@@ -20,9 +20,9 @@ AFRAME.registerComponent('player-torch', {
   schema: {
     enabled: { type: 'boolean', default: true },
     color: { type: 'color', default: '#FF3333' },
-    intensity: { type: 'number', default: 6.5 },
+    intensity: { type: 'number', default: 8.0 },
     distance: { type: 'number', default: 15 },
-    angle: { type: 'number', default: 33 },
+    angle: { type: 'number', default: 70 },
     penumbra: { type: 'number', default: 0.4 },
     decay: { type: 'number', default: 1.5 },
     castShadow: { type: 'boolean', default: true },

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         title: { default: 'Eigengrau Light v1.0' },
         duration: { type: 'number', default: 240000 }, // How long to show message (ms)
         mobileText: { type: 'string', default: 'swipe to turn • walk button to move' },
-        desktopText: { type: 'string', default: '• SPACE for menu' },
+        desktopText: { type: 'string', default: '• SPACE for menu • L for leaderboard' },
         vrText: { type: 'string', default: 'tilt head left toggles walk • tilt head right toggles menu' },
         goalText: { type: 'string', default: 'explore infinite world • collect vibes • beware the night!' }
       },

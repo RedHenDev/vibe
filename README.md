@@ -47,6 +47,10 @@ ad como key
 
 to do
 
+-b vibes specials need to accumulate time, not reset due to set timeout from first vibe collected
+
+-b pulse kick to other players not working...
+
 -b leaderboard does not sync across clients.
 
 -b Sync features like collectibles and NPCs. And projectiles. Well, that is, projectile events? Vibe best solution.
