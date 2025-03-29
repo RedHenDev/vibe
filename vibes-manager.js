@@ -30,11 +30,7 @@ AFRAME.registerSystem('collectible-manager', {
     spawnInterval: { default: 10000 }, // ms between spawn attempts
     renderDistance: { default: 150 }
   },
-  
-  init: function() {
-    DELETED_CONTENT_MARKER
-  },
-  
+
   init: function() {
     // Storage for active collectibles
     this.collectibles = new Map();

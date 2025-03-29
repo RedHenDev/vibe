@@ -29,7 +29,7 @@ function createLeaderboardButton() {
   // Style the button
   Object.assign(toggleButton.style, {
     position: 'fixed',
-    top: '120px',
+    top: '80px',
     right: '10px',
     width: '40px',
     height: '40px',
@@ -120,6 +120,9 @@ AFRAME.registerComponent('leaderboard-manager', {
     if (time - this.lastRefresh > this.data.refreshInterval) {
       this.lastRefresh = time;
       this.updateLeaderboard();
+      
+      // Also send our current score to server
+      this.sendScoreUpdate();
     }
   },
   
@@ -131,7 +134,7 @@ AFRAME.registerComponent('leaderboard-manager', {
     // Style the panel
     Object.assign(leaderboard.style, {
       position: 'fixed',
-      top: '80px',
+      top: '120px',
       right: '10px',
       width: '250px',
       maxHeight: '60%',
@@ -168,113 +171,139 @@ AFRAME.registerComponent('leaderboard-manager', {
   },
   
   setupWebSocketHandlers: function() {
-    // Use existing socket if available
-    if (window.socket) {
-      const originalOnMessage = window.socket.onmessage;
-      
-      window.socket.onmessage = (event) => {
-        // Call original handler
-        if (originalOnMessage) {
-          originalOnMessage.call(window.socket, event);
-        }
+    // We need to hook into the existing WebSocket system from game.js
+    const self = this;
+    
+    // Wait for WebSocket to be initialized by game.js
+    const checkForSocket = setInterval(() => {
+      if (window.socket && window.socket.readyState === WebSocket.OPEN) {
+        clearInterval(checkForSocket);
         
-        // Handle our messages
-        try {
-          const message = JSON.parse(event.data);
-          
-          // Handle different message types
-          if (message.type === 'players') {
-            this.updatePlayerScores(message.players);
-          } else if (message.type === 'playerScore') {
-            this.updatePlayerScore(message.id, message.score);
+        // Store the original message handler
+        const originalOnMessage = window.socket.onmessage;
+        
+        // Replace with our handler that still calls the original
+        window.socket.onmessage = function(event) {
+          // Call the original handler
+          if (originalOnMessage) {
+            originalOnMessage.call(this, event);
           }
-        } catch (e) {
-          console.error('Error parsing leaderboard message:', e);
-        }
-      };
+          
+          // Add our handler
+          try {
+            const message = JSON.parse(event.data);
+            
+            // Process players message for updating scores
+            if (message.type === 'players') {
+              self.processPlayersUpdate(message.players);
+            }
+            
+            // Handle specific score updates
+            if (message.type === 'playerScore') {
+              self.updatePlayerScore(message.id, message.score, message.name);
+            }
+          } catch (e) {
+            console.error('Error in leaderboard WebSocket handler:', e);
+          }
+        };
+        
+        console.log('Leaderboard WebSocket handlers initialized');
+      }
+    }, 500);
+  },
+  
+  processPlayersUpdate: function(players) {
+    // Process the full players object from server
+    for (const id in players) {
+      const player = players[id];
       
-      // Send our initial score
-      this.sendScoreUpdate();
+      // Add or update player in our scores map
+      this.playerScores.set(id, {
+        name: player.name || 'Unknown Player',
+        score: player.score || 0,
+        isLocal: id === window.playerId
+      });
     }
   },
   
+  updatePlayerScore: function(id, score, name) {
+    // Update a specific player's score
+    const playerData = this.playerScores.get(id) || { 
+      name: name || 'Unknown Player',
+      score: 0,
+      isLocal: id === window.playerId
+    };
+    
+    playerData.score = score;
+    this.playerScores.set(id, playerData);
+  },
+  
+  getLocalPlayerScore: function() {
+    // Get the current score from vibe collection system
+    let score = 0;
+    
+    // Try various possible ways to get the vibe count
+    try {
+      // First, try to access collectible manager if it exists
+      const scene = document.querySelector('a-scene');
+      if (scene.systems['collectible-manager']) {
+        const stats = scene.systems['collectible-manager'].stats;
+        if (stats && typeof stats.points === 'number') {
+          score = stats.points;
+        }
+      }
+      
+      // If that didn't work, try the global collectiblesManager
+      if (score === 0 && window.collectiblesManager) {
+        if (typeof window.collectiblesManager.getStats === 'function') {
+          const stats = window.collectiblesManager.getStats();
+          if (stats && typeof stats.points === 'number') {
+            score = stats.points;
+          }
+        } else if (window.collectiblesManager.stats) {
+          score = window.collectiblesManager.stats.points || 0;
+        }
+      }
+      
+      // As a fallback, check for any vibes element in the DOM
+      if (score === 0) {
+        const vibesElement = document.querySelector('#collectibles-hud-text');
+        if (vibesElement) {
+          const text = vibesElement.getAttribute('value');
+          if (text) {
+            const match = text.match(/vibes\s+(\d+)/i);
+            if (match && match[1]) {
+              score = parseInt(match[1]);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error getting local player score:', e);
+    }
+    
+    return score;
+  },
+  
   sendScoreUpdate: function() {
-    // Only send if socket is available
-    if (!window.socket || window.socket.readyState !== WebSocket.OPEN) {
+    // Don't send if socket isn't ready
+    if (!window.socket || window.socket.readyState !== WebSocket.OPEN || !window.playerId) {
       return;
     }
     
     // Get current score
-    let score = 0;
+    const score = this.getLocalPlayerScore();
     
-    // Try to get score from collectibles manager
-    if (window.collectiblesManager && window.collectiblesManager.getStats) {
-      const stats = window.collectiblesManager.getStats();
-      score = stats.points;
-    } else {
-      // Try to get from system directly
-      const scene = document.querySelector('a-scene');
-      if (scene && scene.systems['collectible-manager']) {
-        score = scene.systems['collectible-manager'].stats.points;
-      }
+    // Update our local entry
+    if (window.playerId) {
+      this.updatePlayerScore(window.playerId, score, window.playerName);
     }
     
-    // Send score update
+    // Send to server
     window.socket.send(JSON.stringify({
       type: 'playerScore',
       score: score
     }));
-  },
-  
-  updatePlayerScores: function(players) {
-    for (const id in players) {
-      const player = players[id];
-      
-      // Skip if no name
-      if (!player.name) continue;
-      
-      // Update or add player
-      this.playerScores.set(id, {
-        name: player.name,
-        score: player.score || 0
-      });
-    }
-    
-    // Update local player
-    if (window.playerId && window.playerName) {
-      // Get current score
-      let score = 0;
-      
-      // Try to get from system directly
-      const scene = document.querySelector('a-scene');
-      if (scene && scene.systems['collectible-manager']) {
-        score = scene.systems['collectible-manager'].stats.points;
-      }
-      
-      this.playerScores.set(window.playerId, {
-        name: window.playerName,
-        score: score,
-        isLocal: true
-      });
-    }
-    
-    // Update the leaderboard display
-    this.updateLeaderboard();
-  },
-  
-  updatePlayerScore: function(id, score) {
-    if (!this.playerScores.has(id)) {
-      // We don't have this player yet, ignore
-      return;
-    }
-    
-    // Update score
-    const playerData = this.playerScores.get(id);
-    playerData.score = score;
-    this.playerScores.set(id, playerData);
-    
-    // Update the leaderboard display
-    this.updateLeaderboard();
   },
   
   updateLeaderboard: function() {
@@ -341,56 +370,5 @@ AFRAME.registerComponent('leaderboard-manager', {
       });
       scoresContainer.appendChild(noPlayers);
     }
-    
-    // Send our score update to others (but not too often)
-    if (Math.random() < 0.2) { // Only 20% of updates to reduce traffic
-      this.sendScoreUpdate();
-    }
   }
 });
-
-// Helper function to update the server.js code
-function updateServerJS() {
-  // This is just a reference for server-side changes needed
-  // These changes would need to be made to the actual server.js file
-  
-  /*
-  // Add to the existing WebSocket message handler in server.js
-  
-  ws.on('message', (message) => {
-    try {
-      const data = JSON.parse(message);
-      
-      switch (data.type) {
-        // Existing cases...
-        
-        case 'playerScore':
-          // Update player's score
-          if (players[playerId]) {
-            players[playerId].score = data.score;
-            
-            // Broadcast updated players
-            broadcastToAll({
-              type: 'players',
-              players: players
-            });
-          }
-          break;
-      }
-    } catch (error) {
-      console.error('Error processing message:', error);
-    }
-  });
-  
-  // Modify the players object structure to include scores
-  const playerId = uuidv4();
-  players[playerId] = {
-    position: data.position,
-    rotation: data.rotation || { x: 0, y: 0, z: 0 },
-    color: data.color,
-    model: data.model,
-    name: playerName,
-    score: 0 // Initialize score
-  };
-  */
-}

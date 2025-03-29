@@ -18,12 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
   AFRAME.registerComponent('projectile-system', {
     schema: {
       maxProjectiles: { type: 'number', default: 50 },       // Maximum number of projectiles
-      projectileSpeed: { type: 'number', default: 99 },      // Speed of projectiles
-      projectileLifetime: { type: 'number', default: 4000 }, // How long projectiles live (ms)
+      projectileSpeed: { type: 'number', default: 90 },      // Speed of projectiles
+      projectileLifetime: { type: 'number', default: 2000 }, // How long projectiles live (ms)
       impactLifetime: { type: 'number', default: 2000 },     // How long projectiles remain after impact (ms)
       cooldown: { type: 'number', default: 200 },            // Cooldown between shots (ms)
       pushForce: { type: 'number', default: 5 },             // Force applied when hitting targets
-      projectileColor: { type: 'color', default: '#16161D' }, // Icy blue projectile color
+      projectileColor: { type: 'color', default: '#00CCFF' }, // Icy blue projectile color
       projectileSize: { type: 'number', default: 0.5 },      // Size of projectiles
       trailEnabled: { type: 'boolean', default: true },      // Enable trail effects
       showFireButton: { type: 'boolean', default: true },    // Show fire button on mobile
@@ -41,6 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
       // Keep track of when we can fire next
       this.lastFireTime = 0;
       
+      // Touch tracking for distinguishing taps from drags
+      this.touchStartX = 0;
+      this.touchStartY = 0;
+      this.touchStartTime = 0;
+      this.touchMoved = false;
+      this.maxTapDistance = 10; // Max pixels to consider a touch a tap, not a drag
+      this.maxTapDuration = 300; // Max milliseconds to consider a touch a tap, not a drag
+      
       // Get references to important elements
       this.player = document.querySelector('#player').object3D;
       this.camera = document.querySelector('#cam').object3D;
@@ -54,12 +62,16 @@ document.addEventListener('DOMContentLoaded', function() {
       // Bind event listeners
       this.onMouseDown = this.onMouseDown.bind(this);
       this.onTouchStart = this.onTouchStart.bind(this);
+      this.onTouchMove = this.onTouchMove.bind(this);
+      this.onTouchEnd = this.onTouchEnd.bind(this);
       
       // Add appropriate event listeners based on device
       if (this.isMobile) {
         // Mobile: add touch events
         document.addEventListener('touchstart', this.onTouchStart);
-        console.log('Projectile system using touch controls');
+        document.addEventListener('touchmove', this.onTouchMove);
+        document.addEventListener('touchend', this.onTouchEnd);
+        console.log('Projectile system using touch controls with tap detection');
       } else {
         // Desktop: add mouse events
         document.addEventListener('mousedown', this.onMouseDown);
@@ -83,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Create material with icy blue color
       const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(this.data.projectileColor),
+        color: new THREE.Color('#00CCFF'),
         transparent: true,
         opacity: 0.8,
         side: THREE.DoubleSide
@@ -129,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
     createTrailEffect: function() {
       // Create a more transparent white trail
       this.trailMaterial = new THREE.MeshBasicMaterial({
-        color: new THREE.Color('#00CCFF'),
+        color: new THREE.Color('#FFFFFF'),
         transparent: true,
         opacity: 0.3,
         side: THREE.DoubleSide
@@ -241,34 +253,65 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Fire projectile on tap
-      this.fireProjectile();
+      // Store touch start position and time for later comparison
+      this.touchStartX = touch.clientX;
+      this.touchStartY = touch.clientY;
+      this.touchStartTime = Date.now();
+      this.touchMoved = false;
+      
+      // Don't fire on touch start - wait for touch end to determine if it's a tap
     },
     
-    isTouchingUIElement: function(touch) {
-      // Get the element being touched
-      const element = document.elementFromPoint(touch.clientX, touch.clientY);
-      if (!element) return false;
+    onTouchMove: function(event) {
+      // If touch has moved too much, mark as a drag action, not a tap
+      if (!this.touchMoved && event.touches[0]) {
+        const touch = event.touches[0];
+        const dx = touch.clientX - this.touchStartX;
+        const dy = touch.clientY - this.touchStartY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // If moved more than threshold, it's a drag not a tap
+        if (distance > this.maxTapDistance) {
+          this.touchMoved = true;
+        }
+      }
+    },
+    
+    onTouchEnd: function(event) {
+      // Calculate touch duration
+      const touchDuration = Date.now() - this.touchStartTime;
       
-      // List of CSS selectors for UI elements to ignore
-      const uiSelectors = [
-        '.move-toggle-btn',   // Walk button
-        '.menu-toggle-btn',   // Menu button
-        '.music-toggle-btn',  // Music toggle
-        '#welcome-message',   // Welcome message
-        'button',             // Any button
-        '.a-enter-vr',        // VR button
-        '#npc-stats',         // NPC stats panel
-        '#projectile-debug',  // Projectile debug panel
-        '#collectibles-hud',  // Collectibles HUD
-        '#connection-status'  // Connection status
-      ];
+      // Fire only if:
+      // 1. Touch didn't move much (not a drag)
+      // 2. Touch was short (quick tap)
+      // 3. We're not touching a UI element
+      if (!this.touchMoved && 
+          touchDuration < this.maxTapDuration) {
+        
+        // Get the element at the end position
+        const elementAtEnd = document.elementFromPoint(this.touchStartX, this.touchStartY);
+        
+        // Final check if we're on a UI element
+        if (elementAtEnd && !this.isElementUIComponent(elementAtEnd)) {
+          this.fireProjectile();
+        }
+      }
       
-      // Check if the touched element or any of its parents match the UI selectors
+      // Reset touch tracking
+      this.touchMoved = false;
+    },
+    
+    isElementUIComponent: function(element) {
+      // Check if element or any parent matches UI selectors
       let current = element;
       while (current) {
         // Check all selectors
-        for (const selector of uiSelectors) {
+        for (const selector of [
+          '.move-toggle-btn', '.menu-toggle-btn', '.music-toggle-btn',
+          '#welcome-message', 'button', '.a-enter-vr', '#npc-stats',
+          '#projectile-debug', '#collectibles-hud', '#connection-status',
+          '.fire-button'
+        ]) {
           if (current.matches && current.matches(selector)) {
             return true;
           }
@@ -276,8 +319,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Move up to parent
         current = current.parentElement;
       }
-      
       return false;
+    },
+    
+    isTouchingUIElement: function(touch) {
+      // Get the element being touched
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (!element) return false;
+      
+      return this.isElementUIComponent(element);
     },
     
     checkHeadTilt: function() {
@@ -597,6 +647,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Clean up event listeners
       document.removeEventListener('mousedown', this.onMouseDown);
       document.removeEventListener('touchstart', this.onTouchStart);
+      document.removeEventListener('touchmove', this.onTouchMove);
+      document.removeEventListener('touchend', this.onTouchEnd);
       
       // Clear interval
       if (this.checkInterval) {

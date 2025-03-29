@@ -47,6 +47,12 @@ ad como key
 
 to do
 
+-b leaderboard does not sync across clients.
+
+-b Sync features like collectibles and NPCs. And projectiles. Well, that is, projectile events? Vibe best solution.
+
+-f 'house' to enter vibehouse.gwendall.com by @gwendall
+
 -f sync night mode across clients.
 
 -f quake style portal effect
