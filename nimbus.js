@@ -18,16 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     schema: {
       enabled: { default: true },
       // Cloud distribution
-      totalClouds: { type: 'number', default: 32 }, // Total cloud instances
-      skyRadius: { type: 'number', default: 420 },
-      cloudBaseHeight: { type: 'number', default: 170 },
-      heightRange: { type: 'number', default: 50 },
+      totalClouds: { type: 'number', default: 28 }, // Total cloud instances
+      skyRadius: { type: 'number', default: 360 },
+      cloudBaseHeight: { type: 'number', default: 128 },
+      heightRange: { type: 'number', default: 128 },
       // Visual properties
       cloudColor: { type: 'color', default: '#FFFFFF' },
       // Optimization settings
       useInstancing: { type: 'boolean', default: true },
       useBillboards: { type: 'boolean', default: false },
-      maxVisibleDistance: { type: 'number', default: 600 },
+      maxVisibleDistance: { type: 'number', default: 360 },
       updateFrequency: { type: 'number', default: 4 } // Update every N frames
     },
   
@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         opacity: 0.7,
         roughness: 0.8,
         metalness: 0.1,
+        shadows: false,
         flatShading: true
       });
       

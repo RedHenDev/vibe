@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
       schema: {
         title: { default: 'Eigengrau Light v1.0' },
         duration: { type: 'number', default: 240000 }, // How long to show message (ms)
-        mobileText: { type: 'string', default: 'swipe to turn • walk button to move' },
-        desktopText: { type: 'string', default: '• SPACE for menu • L for leaderboard' },
-        vrText: { type: 'string', default: 'tilt head left toggles walk • tilt head right toggles menu' },
+        mobileText: { type: 'string', default: '• swipe to turn • walk button to move • tap to shoot pulse' },
+        desktopText: { type: 'string', default: '• SPACE for menu • L for leaderboard • CLICK to shoot pulse' },
+        vrText: { type: 'string', default: 'tilt head left toggles walk • tilt head right shoots pulse • farther right toggles menu' },
         goalText: { type: 'string', default: 'explore infinite world • collect vibes • beware the night!' }
       },
   
@@ -26,27 +26,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const welcomeContainer = document.createElement('div');
         welcomeContainer.id = 'welcome-message';
         
-        // Set styles
+        // Set styles for container
         Object.assign(welcomeContainer.style, {
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          top: '0',
+          left: '0',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background overlay
+          zIndex: '9998', // Below the actual message box
+          backdropFilter: 'blur(3px)'
+        });
+        
+        // Create the message box
+        const messageBox = document.createElement('div');
+        
+        // Set styles for message box
+        Object.assign(messageBox.style, {
           backgroundColor: 'rgba(4, 112, 134, 0.85)',
           color: 'white',
-          padding: '20px 30px',
+          padding: '30px',
           borderRadius: '12px',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
           fontFamily: 'Arial, sans-serif',
           textAlign: 'center',
-          zIndex: '9999',
           backdropFilter: 'blur(5px)',
           transition: 'opacity 0.5s ease-in-out',
           opacity: '0',
-          width: isMobile ? '90%' : '90%',
-          height: isMobile ? '90%' : '90%',
+          width: isMobile ? '85%' : '500px',
           maxWidth: '90%',
-          border: '2px solid rgba(255, 255, 255, 0.2)'
+          maxHeight: '80%',
+          border: '2px solid rgba(255, 255, 255, 0.2)',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
         });
   
         // Create title
@@ -109,20 +127,23 @@ document.addEventListener('DOMContentLoaded', () => {
           fontStyle: 'italic'
         });
   
-        // Add elements to container
-        welcomeContainer.appendChild(title);
-        welcomeContainer.appendChild(goalDiv);
-        welcomeContainer.appendChild(controlsTitle);
-        welcomeContainer.appendChild(controlsDiv);
-        welcomeContainer.appendChild(vrDiv);
-        welcomeContainer.appendChild(dismissHint);
+        // Add elements to message box
+        messageBox.appendChild(title);
+        messageBox.appendChild(goalDiv);
+        messageBox.appendChild(controlsTitle);
+        messageBox.appendChild(controlsDiv);
+        messageBox.appendChild(vrDiv);
+        messageBox.appendChild(dismissHint);
+        
+        // Add message box to container
+        welcomeContainer.appendChild(messageBox);
   
         // Add to document
         document.body.appendChild(welcomeContainer);
   
         // Fade in after a short delay
         setTimeout(() => {
-          welcomeContainer.style.opacity = '1';
+          messageBox.style.opacity = '1';
         }, 300);
   
         // Add click handler to dismiss
@@ -141,8 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (element.dataset.dismissing) return;
         element.dataset.dismissing = 'true';
         
+        // Find the message box within the container
+        const messageBox = element.querySelector('div');
+        
         // Fade out
-        element.style.opacity = '0';
+        if (messageBox) {
+          messageBox.style.opacity = '0';
+        }
+        element.style.backgroundColor = 'rgba(0, 0, 0, 0)';
 
         // For enabling music and sounds.
         document.dispatchEvent(new CustomEvent('welcome-dismissed'));
