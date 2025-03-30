@@ -2,7 +2,7 @@
 const config = {
     websocketUrl: 'wss://weeble-server.glitch.me/',
     playerColors: ['white', 'black'],
-    playerModels: ['#mShelby'] // Available models for player avatars
+    playerModels: ['#mWibbit', '#mShelby'] // Available models for player avatars
 };
 
 // Create a billboard component that makes entities always face the camera

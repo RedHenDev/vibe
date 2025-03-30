@@ -38,15 +38,46 @@ AFRAME.registerSystem('npc-manager', {
       this.processingTime = 0;
       this.frameCount = 0;
       this.avgProcessingTime = 0;
+  
+      // Set up callback for when day-night cycle entity is available
+      this.waitForDayNightCycle();
       
       console.log(`NPC Pool created with ${this.data.poolSize} entities`);
     },
     
+    waitForDayNightCycle: function() {
+      // This will check for the day-night-cycle component and set a reference to it when available
+      const checkForCycle = () => {
+        const cycleEntity = document.querySelector('#day-night-cycle');
+        if (cycleEntity && cycleEntity.components && cycleEntity.components['day-night-cycle']) {
+          this.dayNightCycle = cycleEntity.components['day-night-cycle'];
+          console.log('NPC Manager connected to day-night-cycle');
+        } else {
+          // If not found, try again in a moment
+          setTimeout(checkForCycle, 1000);
+        }
+      };
+      
+      // Start checking
+      checkForCycle();
+    },
+    
+    isNightTime: function() {
+      // Check if it's night time based on day-night-cycle component
+      if (this.dayNightCycle) {
+        return this.dayNightCycle.isNight;
+      }
+      
+      // Fallback if day-night cycle not available yet
+      return false;
+    },
+    
     defineNPCTypes: function() {
-      // Define different types of NPCs
+      // Define different types of NPCs with nocturnal property
       this.npcTypes = {
         'glass-tooth_3': {
           model: '#mGlasst',
+          nocturnal: true,
           scale: '3 3 3',
           targetID: '#player',
           height: 12,
@@ -56,10 +87,11 @@ AFRAME.registerSystem('npc-manager', {
           adjustY: 3.14,
           wiggle: true,
           flee: false,
-          spawnChance: 0 // 100% chance to spawn this type
+          spawnChance: 0.33
         },
-        'vibe-leech': {
-          model: '#mCublit', // Different model!
+        'vibe-slip': {
+          model: '#mCublit',
+          nocturnal: true,
           scale: '32 32 32',
           height: 64,
           speed: 1.2,
@@ -67,10 +99,11 @@ AFRAME.registerSystem('npc-manager', {
           clampY: false,
           wiggle: false,
           flee: false,
-          spawnChance: 0 // 0% chance to spawn this type
+          spawnChance: 0.33
         },
         'glass-tooth_7': {
-          model: '#mGlasst', // Same model but flees from player
+          model: '#mGlasst',
+          nocturnal: true,
           scale: '7 7 7',
           height: 6,
           speed: 0.8,
@@ -79,27 +112,75 @@ AFRAME.registerSystem('npc-manager', {
           adjustY: 3.14,
           wiggle: true,
           flee: false,
-          spawnChance: 0 // 0% chance to spawn this type
+          spawnChance: 0.33
+        },
+        'wibbit': {
+          model: '#mWibbit',
+          nocturnal: false,
+          scale: '2 2 2',
+          height: 2,
+          speed: 3,
+          rSpeed: 4.2,
+          clampY: true,
+          wiggle: true,
+          flee: false,
+          spawnChance: 0.33
+        },
+        'shab': {
+          model: '#mShab',
+          nocturnal: false,
+          scale: '1 1 1',
+          height: 1,
+          speed: 5,
+          rSpeed: 4.2,
+          clampY: true,
+          wiggle: true,
+          flee: true,
+          spawnChance: 0.33
         },
         'shelby': {
-            model: '#mShelby', // Different model!
-            scale: '4 4 4',
-            height: 2,
-            speed: 0.5,
-            rSpeed: 4.2,
-            clampY: true,
-            wiggle: true,
-            flee: false,
-            spawnChance: 1.0 // 0% chance to spawn this type
-          }
+          model: '#mShelby',
+          nocturnal: false,
+          scale: '4 4 4',
+          height: 2,
+          speed: 0.5,
+          rSpeed: 4.2,
+          clampY: true,
+          wiggle: true,
+          flee: false,
+          spawnChance: 0.33
+        }
       };
     },
     
     initializeNPCPool: function() {
       // Create all NPCs upfront and store them in the inactive pool
-      for (let i = 0; i < this.data.poolSize; i++) {
-        // Determine the NPC type
-        const npcType = this.getRandomNPCType();
+      // Ensure we have a balanced mix of nocturnal and diurnal NPCs
+      
+      // Get nocturnal and diurnal types
+      const nocturnalTypes = [];
+      const diurnalTypes = [];
+      
+      for (const type in this.npcTypes) {
+        if (this.npcTypes[type].nocturnal) {
+          nocturnalTypes.push(type);
+        } else {
+          diurnalTypes.push(type);
+        }
+      }
+      
+      console.log(`NPC types - Nocturnal: ${nocturnalTypes.join(', ')}, Diurnal: ${diurnalTypes.join(', ')}`);
+      
+      // Calculate how many of each to create
+      // Make sure we have at least a minimum number of each type
+      const minPerCategory = Math.max(3, Math.floor(this.data.poolSize / 4));
+      const nocturnalCount = Math.max(minPerCategory, Math.floor(this.data.poolSize / 2));
+      const diurnalCount = this.data.poolSize - nocturnalCount;
+      
+      console.log(`Creating ${nocturnalCount} nocturnal and ${diurnalCount} diurnal NPCs`);
+      
+      // Function to create an NPC of a specific type
+      const createNPC = (npcType, index) => {
         const npcConfig = this.npcTypes[npcType];
         
         // Create the NPC entity
@@ -111,7 +192,7 @@ AFRAME.registerSystem('npc-manager', {
         npcEntity.setAttribute('position', '0 -9999 0');
         
         // Set unique ID for easier tracking
-        const npcId = 'npc-pool-' + i;
+        const npcId = `npc-${npcConfig.nocturnal ? 'night' : 'day'}-${index}`;
         npcEntity.setAttribute('id', npcId);
         
         // Add AI component but set to inactive
@@ -138,13 +219,32 @@ AFRAME.registerSystem('npc-manager', {
           id: npcId,
           active: false,
           originalSpeed: npcConfig.speed,
-          spawnTime: 0
+          spawnTime: 0,
+          nocturnal: npcConfig.nocturnal
         };
         
         // Store in arrays
         this.npcs.push(npcRef);
         this.inactiveNPCs.add(npcRef);
+        
+        return npcRef;
+      };
+      
+      // Create nocturnal NPCs
+      for (let i = 0; i < nocturnalCount; i++) {
+        // Select a random nocturnal type
+        const npcType = nocturnalTypes[Math.floor(Math.random() * nocturnalTypes.length)];
+        createNPC(npcType, i);
       }
+      
+      // Create diurnal NPCs
+      for (let i = 0; i < diurnalCount; i++) {
+        // Select a random diurnal type
+        const npcType = diurnalTypes[Math.floor(Math.random() * diurnalTypes.length)];
+        createNPC(npcType, i + nocturnalCount);
+      }
+      
+      console.log(`NPC Pool created with ${this.npcs.length} entities (${nocturnalCount} nocturnal, ${diurnalCount} diurnal)`);
     },
     
     tick: function(time) {
@@ -214,10 +314,34 @@ AFRAME.registerSystem('npc-manager', {
     },
     
     activateNPC: function() {
-      // Take the first NPC from the inactive pool
-      const npc = this.inactiveNPCs.values().next().value;
-      if (!npc) return; // No inactive NPCs available
+      // Get the current day/night state
+      const isNight = this.isNightTime();
       
+      // Find NPCs of the appropriate type (nocturnal for night, diurnal for day)
+      const validNPCs = Array.from(this.inactiveNPCs)
+        .filter(npc => {
+          const npcConfig = this.npcTypes[npc.type];
+          return npcConfig && ((isNight && npcConfig.nocturnal) || (!isNight && !npcConfig.nocturnal));
+        });
+      
+      // If no valid NPCs found, log and return
+      if (validNPCs.length === 0) {
+        console.warn(`No inactive ${isNight ? 'nocturnal' : 'diurnal'} NPCs available to spawn`);
+        return;
+      }
+      
+      // Select a random NPC from the valid ones
+      const npc = validNPCs[Math.floor(Math.random() * validNPCs.length)];
+      
+      // Get the NPC configuration
+      const npcConfig = this.npcTypes[npc.type];
+      
+      // Double check validity
+      if (!npcConfig || (isNight && !npcConfig.nocturnal) || (!isNight && npcConfig.nocturnal)) {
+        console.warn(`Invalid NPC selected: ${npc.type}, nocturnal: ${npcConfig?.nocturnal}, isNight: ${isNight}`);
+        return;
+      }
+    
       // Remove from inactive pool
       this.inactiveNPCs.delete(npc);
       
@@ -231,18 +355,20 @@ AFRAME.registerSystem('npc-manager', {
       // Get terrain height at spawn position
       const spawnY = getTerrainHeight(spawnX, spawnZ);
       
-      // Get configuration for this NPC type
-      const npcConfig = this.npcTypes[npc.type];
-      
-      // Update position
-      //npc.el.setAttribute('position', `${spawnX} ${spawnY + npcConfig.height} ${spawnZ}`);
-      // Spawn at -20 so that does not suddenly appear in air.
+      // Spawn at -20 so that does not suddenly appear in air
       npc.el.setAttribute('position', `${spawnX} -20 ${spawnZ}`);
       
       // Restore original speed and activate
       const aiComponent = npc.el.components['ai-locomotion'];
       if (aiComponent) {
-        aiComponent.data.speed = npcConfig.speed;
+        // Adjust speed based on time of day
+        let speed = npcConfig.speed;
+        if (isNight && npcConfig.nocturnal) {
+          // Night creatures are faster at night
+          speed *= 1.5;
+        }
+        
+        aiComponent.data.speed = speed;
         aiComponent.data.active = true;
         aiComponent.data.updateInterval = 1; // Normal update frequency
       }
@@ -254,7 +380,7 @@ AFRAME.registerSystem('npc-manager', {
       // Add to active set
       this.activeNPCs.add(npc);
       
-      // console.log(`Activated ${npc.type} NPC at ${spawnX.toFixed(1)}, ${spawnY.toFixed(1)}, ${spawnZ.toFixed(1)}`);
+      console.log(`Activated ${isNight ? 'nocturnal' : 'diurnal'} NPC: ${npc.type}`);
     },
     
     deactivateNPC: function(npc) {
@@ -279,8 +405,6 @@ AFRAME.registerSystem('npc-manager', {
       
       // Add to inactive pool
       this.inactiveNPCs.add(npc);
-      
-      // console.log(`Deactivated NPC, active count: ${this.activeNPCs.size}`);
     },
     
     updateNPCActivity: function(npc, fullyActive, distance) {
@@ -289,9 +413,22 @@ AFRAME.registerSystem('npc-manager', {
       const aiComponent = npc.el.components['ai-locomotion'];
       if (!aiComponent) return;
       
+      // Get NPC configuration
+      const npcConfig = this.npcTypes[npc.type];
+      if (!npcConfig) return;
+      
       if (fullyActive) {
         // Full speed when close
-        aiComponent.data.speed = this.npcTypes[npc.type].speed;
+        let speed = npcConfig.speed;
+        
+        // Adjust speed based on time of day
+        const isNight = this.isNightTime();
+        if ((isNight && npcConfig.nocturnal) || (!isNight && !npcConfig.nocturnal)) {
+          // Creatures are faster during their preferred time
+          speed *= isNight ? 1.5 : 1.0;
+        }
+        
+        aiComponent.data.speed = speed;
         aiComponent.data.active = true;
         
         // Update frequency based on distance
@@ -306,34 +443,116 @@ AFRAME.registerSystem('npc-manager', {
         // Reduced activity for distant NPCs
         // Instead of fully deactivating, we reduce speed and update frequency
         const distanceFactor = Math.max(0, 1 - (distance - this.data.activationDistance) / 50);
-        aiComponent.data.speed = this.npcTypes[npc.type].speed * distanceFactor * 0.5;
+        aiComponent.data.speed = npcConfig.speed * distanceFactor * 0.5;
         aiComponent.data.updateInterval = 5; // Reduced update frequency
         aiComponent.data.active = distanceFactor > 0.1; // Only deactivate if very far
       }
     },
     
+    // This function now factors in day/night when returning available NPC types
     getRandomNPCType: function() {
-      // Select NPC type based on spawn chances
-      const rand = Math.random();
-      let cumulativeChance = 0;
+      // Get current day/night state
+      const isNight = this.isNightTime();
       
-      // Normalize chances
-      const types = Object.keys(this.npcTypes);
+      // Filter for types that are appropriate for the current time
+      const availableTypes = Object.keys(this.npcTypes).filter(type => {
+        const npcConfig = this.npcTypes[type];
+        return (isNight && npcConfig.nocturnal) || (!isNight && !npcConfig.nocturnal);
+      });
+      
+      // If no appropriate types, return a random one anyway
+      if (availableTypes.length === 0) {
+        const allTypes = Object.keys(this.npcTypes);
+        return allTypes[Math.floor(Math.random() * allTypes.length)];
+      }
+      
+      // Calculate total spawn chance of available types
       let totalChance = 0;
-      types.forEach(type => {
+      availableTypes.forEach(type => {
         totalChance += this.npcTypes[type].spawnChance;
       });
       
-      // Pick based on normalized probabilities
-      for (const type of types) {
-        cumulativeChance += this.npcTypes[type].spawnChance / totalChance;
+      // Select based on spawn chances
+      const rand = Math.random() * totalChance;
+      let cumulativeChance = 0;
+      
+      for (const type of availableTypes) {
+        cumulativeChance += this.npcTypes[type].spawnChance;
         if (rand < cumulativeChance) {
           return type;
         }
       }
       
-      // Default to first type
-      return types[0];
+      // Default to first available type
+      return availableTypes[0];
+    },
+    
+    // Method to be called from day-night-cycle when time changes
+    // This will force the activation/deactivation of appropriate NPCs
+    handleTimeChange: function(isNight) {
+      console.log(`NPC Manager handling time change to ${isNight ? 'night' : 'day'} mode`);
+      
+      // Step 1: Deactivate NPCs that shouldn't be active at this time
+      const npcsToDeactivate = [];
+      
+      for (const npc of this.activeNPCs) {
+        const npcConfig = this.npcTypes[npc.type];
+        if (!npcConfig) continue;
+        
+        if ((isNight && !npcConfig.nocturnal) || (!isNight && npcConfig.nocturnal)) {
+          // This NPC shouldn't be active at this time
+          npcsToDeactivate.push(npc);
+        }
+      }
+      
+      // Perform deactivation
+      for (const npc of npcsToDeactivate) {
+        this.deactivateNPC(npc);
+      }
+      
+      console.log(`Deactivated ${npcsToDeactivate.length} NPCs due to time change`);
+      
+      // Step 2: Force spawn of appropriate NPCs
+      const activeCount = this.activeNPCs.size;
+      let maxSpawnCount = this.data.maxNPCs - activeCount;
+      
+      // Increase spawn count for initial population after time change
+      if (maxSpawnCount > 0) {
+        // Try to spawn in batches to ensure we get enough NPCs quickly after time change
+        for (let batch = 0; batch < 3 && maxSpawnCount > 0; batch++) {
+          let spawnedInBatch = 0;
+          
+          for (let i = 0; i < Math.min(maxSpawnCount, 5); i++) {
+            // Before attempting to spawn, check if we have appropriate inactive NPCs
+            const hasValidNPCs = Array.from(this.inactiveNPCs).some(npc => {
+              const config = this.npcTypes[npc.type];
+              return config && ((isNight && config.nocturnal) || (!isNight && !config.nocturnal));
+            });
+            
+            if (!hasValidNPCs) {
+              console.warn(`No more inactive ${isNight ? 'nocturnal' : 'diurnal'} NPCs available to spawn`);
+              break;
+            }
+            
+            // Try to activate an NPC
+            const activeCountBefore = this.activeNPCs.size;
+            this.activateNPC();
+            
+            // Check if we were successful
+            if (this.activeNPCs.size > activeCountBefore) {
+              spawnedInBatch++;
+            }
+          }
+          
+          // Update remaining slots
+          maxSpawnCount -= spawnedInBatch;
+          
+          // If we didn't spawn any in this batch, no point continuing
+          if (spawnedInBatch === 0) break;
+        }
+      }
+      
+      console.log(`Active NPCs after time change: ${this.activeNPCs.size}/${this.data.maxNPCs}`);
     }
   });
   
