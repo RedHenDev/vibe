@@ -5,7 +5,7 @@
 window.COLLECTIBLE_TYPES = {
     "vibe": {
       shape: "sphere",
-      color: "#000000",
+      color: "#00FFFF",
       scale: "3 3 3",
       glow: false,
       points: 5,

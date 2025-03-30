@@ -38,7 +38,7 @@ AFRAME.registerComponent('day-night-cycle', {
     this.sun = document.querySelector('#hamlet');
 
     // The sea is implemented as a-box inside the a-scene
-    this.seaMesh = document.querySelector('a-box[scale="1000 0.01 1000"]');
+    // this.seaMesh = document.querySelector('a-box[scale="1000 0.01 1000"]');
     
     if (!this.sky) {
       console.warn('Day-Night cycle: Could not find a-sky element');

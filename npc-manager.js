@@ -45,7 +45,7 @@ AFRAME.registerSystem('npc-manager', {
     defineNPCTypes: function() {
       // Define different types of NPCs
       this.npcTypes = {
-        'glasst': {
+        'glass-tooth_3': {
           model: '#mGlasst',
           scale: '3 3 3',
           targetID: '#player',
@@ -56,9 +56,9 @@ AFRAME.registerSystem('npc-manager', {
           adjustY: 3.14,
           wiggle: true,
           flee: false,
-          spawnChance: 0.33 // 100% chance to spawn this type
+          spawnChance: 0 // 100% chance to spawn this type
         },
-        'runner': {
+        'vibe-leech': {
           model: '#mCublit', // Different model!
           scale: '32 32 32',
           height: 64,
@@ -67,9 +67,9 @@ AFRAME.registerSystem('npc-manager', {
           clampY: false,
           wiggle: false,
           flee: false,
-          spawnChance: 0.20 // 0% chance to spawn this type
+          spawnChance: 0 // 0% chance to spawn this type
         },
-        'fleer': {
+        'glass-tooth_7': {
           model: '#mGlasst', // Same model but flees from player
           scale: '7 7 7',
           height: 6,
@@ -79,7 +79,7 @@ AFRAME.registerSystem('npc-manager', {
           adjustY: 3.14,
           wiggle: true,
           flee: false,
-          spawnChance: 0.33 // 0% chance to spawn this type
+          spawnChance: 0 // 0% chance to spawn this type
         },
         'shelby': {
             model: '#mShelby', // Different model!
@@ -90,7 +90,7 @@ AFRAME.registerSystem('npc-manager', {
             clampY: true,
             wiggle: true,
             flee: false,
-            spawnChance: 0.8 // 0% chance to spawn this type
+            spawnChance: 1.0 // 0% chance to spawn this type
           }
       };
     },

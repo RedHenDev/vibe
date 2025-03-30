@@ -12,7 +12,8 @@ Claude 3.7 (Anthropic) - coding
 Grok 3 beta (X) - coding
 MeshyAI - 3D modelling, textures, rigging
 Suno - music
-Glitch - backend
+ChatGPT-4o - thumbnail art
+Glitch - backend server
 VS-Code - IDE
 A-Frame (THREE.js under the hood) - VR and platform integration
 [to complete] shoot_01.mp3 - 
@@ -59,6 +60,7 @@ i- take locomotive fun as a key, perhaps secondary mechanic of the game, esp. si
 -b players spawn in random radius around official spawn site, to prevent spawning inside other or stationary models.
 
 -f 2d map showing locations of all clients; dynamically zoom out to fit all in? Or, allow client to zoom as they wish.
+-i clients can bookmark certain locations, recorded onto their 2D map and which also records their journey in each session; this can be downloaded as a .txt file or, better, a pdf image.
 
 -b fuse fix for when on mobile. Seems to remain on.
 
