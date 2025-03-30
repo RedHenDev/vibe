@@ -129,13 +129,13 @@ AFRAME.registerSystem('npc-manager', {
         'shab': {
           model: '#mShab',
           nocturnal: false,
-          scale: '1 1 1',
+          scale: '2 2 2',
           height: 1,
           speed: 5,
           rSpeed: 4.2,
           clampY: true,
           wiggle: true,
-          flee: true,
+          flee: false,
           spawnChance: 0.33
         },
         'shelby': {
