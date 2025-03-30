@@ -33,9 +33,9 @@ CONTROLS:
 
 triage
 
-1- countdown indicator till next night time...
+1- 
 
-2- -refac fix NPC deployment for night-mode
+2- -b vibes specials need to accumulate time, not reset due to set timeout from first vibe collected
 
 3- -f sync day and night mode across clients.
 
@@ -49,15 +49,23 @@ ad como key
 
 to do
 
+-b pulses not yet syncing across clients
+
+DONE-f countdown indicator till next night time...
+
+DONE-refac fix NPC deployment for night-mode
+
+DONE-dev vibe stealing by nocturnal NPCs + sound
+
 i- opening interior start for spawn. Leads to the spectacular view of the procedural terrain. But how to integrate with randomized spawn points at start? Perhaps the interior is a local, private hallucination, if you will?
 
-b- reduce number of times leaderboard updated?
+-b reduce number of times leaderboard updated?
 
-i- perhaps lore and deeper game narrative revealed by NPCs and, or, artefacts found on the terrain -- perhaps map gives clue to this, revealing a log of e.g. 0/10 secrets found or something? Or a log of narrative fragments.
+-i perhaps lore and deeper game narrative revealed by NPCs and, or, artefacts found on the terrain -- perhaps map gives clue to this, revealing a log of e.g. 0/10 secrets found or something? Or a log of narrative fragments.
 
-i- take locomotive fun as a key, perhaps secondary mechanic of the game, esp. since VR (e.g. ATOT web-slinging is fantastic.)
+-i take locomotive fun as a key, perhaps secondary mechanic of the game, esp. since VR (e.g. ATOT web-slinging is fantastic.)
 
--b players spawn in random radius around official spawn site, to prevent spawning inside other or stationary models.
+DONE-b players spawn in random radius around official spawn site, to prevent spawning inside other or stationary models.
 
 -f 2d map showing locations of all clients; dynamically zoom out to fit all in? Or, allow client to zoom as they wish.
 -i clients can bookmark certain locations, recorded onto their 2D map and which also records their journey in each session; this can be downloaded as a .txt file or, better, a pdf image.
@@ -83,13 +91,9 @@ i- take locomotive fun as a key, perhaps secondary mechanic of the game, esp. si
 
 -f glasts swarm view (no harm)
 
-
-
--f countdown indicator till next night time...
+DONE-f countdown indicator till next night time...
 
 -dev projectile pulse (light kick to other players and npcs)
-
--b vibes specials need to accumulate time, not reset due to set timeout from first vibe collected
 
 -dev woods in only certain areas; option to decide manually as well as 'background' deployment of wooded areas from world seed.
 

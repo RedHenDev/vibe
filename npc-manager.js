@@ -194,6 +194,11 @@ AFRAME.registerSystem('npc-manager', {
         // Set unique ID for easier tracking
         const npcId = `npc-${npcConfig.nocturnal ? 'night' : 'day'}-${index}`;
         npcEntity.setAttribute('id', npcId);
+
+        // New night-chase behaviour.
+        if (npcConfig.nocturnal){
+          npcEntity.setAttribute('night-chase', '');
+        }
         
         // Add AI component but set to inactive
         npcEntity.setAttribute('ai-locomotion', {

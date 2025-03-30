@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 AFRAME.registerComponent('day-night-cycle', {
   schema: {
     enabled: { type: 'boolean', default: true },
-    dayDuration: { type: 'number', default: 300000 }, // 5 minutes for day (in ms)
+    dayDuration: { type: 'number', default: 30000 }, // 5 minutes for day (in ms)
     nightDuration: { type: 'number', default: 120000 }, // 2 minutes for night (in ms)
     transitionDuration: { type: 'number', default: 5000 }, // 5 seconds for transition (in ms)
     dayColor: { type: 'color', default: '#00DDFF' }, // Day sky color
@@ -309,7 +309,7 @@ AFRAME.registerComponent('day-night-cycle', {
     
     // Notify players if enabled
     if (this.data.showNotifications) {
-      this.showNotification('The sun ascends! Safety...for now.', '#FFDD44');
+      //this.showNotification('The sun ascends! Safety...for now.', '#FFDD44');
     }
 
     // Adjust sun brightness
