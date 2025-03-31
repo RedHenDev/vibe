@@ -15,10 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 AFRAME.registerComponent('grass-system', {
     // Configuration options
+    // Default instances is 4k.
     schema: {
       chunkSize: { type: 'number', default: 64 },           // Size of each chunk in meters
       renderDistance: { type: 'number', default: 128 },      // Max distance to render grass
-      instancesPerChunk: { type: 'number', default: 4000 },  // Grass blades per chunk
+      instancesPerChunk: { type: 'number', default: 9000 },  // Grass blades per chunk
       updateThreshold: { type: 'number', default: 32 },      // Distance player must move to trigger update
       minHeight: { type: 'number', default: 1.0 },           // Minimum grass height
       maxHeight: { type: 'number', default: 2.5 },           // Maximum grass height
@@ -41,8 +42,9 @@ AFRAME.registerComponent('grass-system', {
       this.chunkQueue = [];
       this.isProcessingQueue = false;
       
-      // Define grass blade geometry and material
-      this.geometry = new THREE.PlaneGeometry(0.2, 2.0); // Width and unit height (will be scaled)
+      // Define grass blade geometry and material.
+      // 0.2 and 2.0
+      this.geometry = new THREE.PlaneGeometry(0.5, 0.8); // Width and unit height (will be scaled)
       
       // Set base color based on day/night mode
       this.data.baseColor = this.data.isNightMode ? this.data.nightColor : this.data.dayColor;

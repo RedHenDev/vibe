@@ -9,7 +9,7 @@ AFRAME.registerSystem('npc-manager', {
     },
   
     init: function() {
-      console.log('Initializing NPC Manager with Object Pooling');
+      // console.log('Initializing NPC Manager with Object Pooling');
       this.player = document.querySelector('#player').object3D;
       this.npcs = []; // Array to track all NPCs (active and inactive)
       this.activeNPCs = new Set(); // Set of active NPCs
@@ -42,7 +42,7 @@ AFRAME.registerSystem('npc-manager', {
       // Set up callback for when day-night cycle entity is available
       this.waitForDayNightCycle();
       
-      console.log(`NPC Pool created with ${this.data.poolSize} entities`);
+      // console.log(`NPC Pool created with ${this.data.poolSize} entities`);
     },
     
     waitForDayNightCycle: function() {
@@ -51,7 +51,7 @@ AFRAME.registerSystem('npc-manager', {
         const cycleEntity = document.querySelector('#day-night-cycle');
         if (cycleEntity && cycleEntity.components && cycleEntity.components['day-night-cycle']) {
           this.dayNightCycle = cycleEntity.components['day-night-cycle'];
-          console.log('NPC Manager connected to day-night-cycle');
+          // console.log('NPC Manager connected to day-night-cycle');
         } else {
           // If not found, try again in a moment
           setTimeout(checkForCycle, 1000);
@@ -169,7 +169,7 @@ AFRAME.registerSystem('npc-manager', {
         }
       }
       
-      console.log(`NPC types - Nocturnal: ${nocturnalTypes.join(', ')}, Diurnal: ${diurnalTypes.join(', ')}`);
+      // console.log(`NPC types - Nocturnal: ${nocturnalTypes.join(', ')}, Diurnal: ${diurnalTypes.join(', ')}`);
       
       // Calculate how many of each to create
       // Make sure we have at least a minimum number of each type
@@ -177,7 +177,7 @@ AFRAME.registerSystem('npc-manager', {
       const nocturnalCount = Math.max(minPerCategory, Math.floor(this.data.poolSize / 2));
       const diurnalCount = this.data.poolSize - nocturnalCount;
       
-      console.log(`Creating ${nocturnalCount} nocturnal and ${diurnalCount} diurnal NPCs`);
+      // console.log(`Creating ${nocturnalCount} nocturnal and ${diurnalCount} diurnal NPCs`);
       
       // Function to create an NPC of a specific type
       const createNPC = (npcType, index) => {
@@ -249,7 +249,7 @@ AFRAME.registerSystem('npc-manager', {
         createNPC(npcType, i + nocturnalCount);
       }
       
-      console.log(`NPC Pool created with ${this.npcs.length} entities (${nocturnalCount} nocturnal, ${diurnalCount} diurnal)`);
+      // console.log(`NPC Pool created with ${this.npcs.length} entities (${nocturnalCount} nocturnal, ${diurnalCount} diurnal)`);
     },
     
     tick: function(time) {
@@ -385,7 +385,7 @@ AFRAME.registerSystem('npc-manager', {
       // Add to active set
       this.activeNPCs.add(npc);
       
-      console.log(`Activated ${isNight ? 'nocturnal' : 'diurnal'} NPC: ${npc.type}`);
+      // console.log(`Activated ${isNight ? 'nocturnal' : 'diurnal'} NPC: ${npc.type}`);
     },
     
     deactivateNPC: function(npc) {
@@ -495,7 +495,7 @@ AFRAME.registerSystem('npc-manager', {
     // Method to be called from day-night-cycle when time changes
     // This will force the activation/deactivation of appropriate NPCs
     handleTimeChange: function(isNight) {
-      console.log(`NPC Manager handling time change to ${isNight ? 'night' : 'day'} mode`);
+      // console.log(`NPC Manager handling time change to ${isNight ? 'night' : 'day'} mode`);
       
       // Step 1: Deactivate NPCs that shouldn't be active at this time
       const npcsToDeactivate = [];
@@ -515,7 +515,7 @@ AFRAME.registerSystem('npc-manager', {
         this.deactivateNPC(npc);
       }
       
-      console.log(`Deactivated ${npcsToDeactivate.length} NPCs due to time change`);
+      // console.log(`Deactivated ${npcsToDeactivate.length} NPCs due to time change`);
       
       // Step 2: Force spawn of appropriate NPCs
       const activeCount = this.activeNPCs.size;
@@ -557,7 +557,7 @@ AFRAME.registerSystem('npc-manager', {
         }
       }
       
-      console.log(`Active NPCs after time change: ${this.activeNPCs.size}/${this.data.maxNPCs}`);
+      // console.log(`Active NPCs after time change: ${this.activeNPCs.size}/${this.data.maxNPCs}`);
     }
   });
   
