@@ -36,7 +36,7 @@ AFRAME.registerComponent('portal-system', {
     // Set up interval to check for portal collisions
     this.checkInterval = setInterval(() => {
       this.checkPortalCollisions();
-    }, 200); // Check every 500ms
+    }, 500); // Check every 500ms
   },
   
   createExitPortal: function() {
@@ -44,7 +44,7 @@ AFRAME.registerComponent('portal-system', {
     const exitPortal = document.createElement('a-entity');
     exitPortal.setAttribute('id', 'exit-portal');
     
-    // Position the portal in the world
+    // Position the portal in the world.
     exitPortal.setAttribute('position', '-95 55 -19');
     
     // Create visible portal ring (torus)
@@ -87,11 +87,11 @@ AFRAME.registerComponent('portal-system', {
     startPortal.setAttribute('id', 'start-portal');
     
     // Position near player spawn
-    startPortal.setAttribute('position', '10 42 -10');
+    startPortal.setAttribute('position', '10 42 22');
     
     // Create visible portal ring (torus)
     const portalRing = document.createElement('a-torus');
-    portalRing.setAttribute('color', '#000000');
+    portalRing.setAttribute('color', '#FFF');
     portalRing.setAttribute('radius', '15');
     portalRing.setAttribute('radius-tubular', '2');
     portalRing.setAttribute('segments-tubular', '32');

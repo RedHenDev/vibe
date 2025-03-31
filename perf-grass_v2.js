@@ -4,7 +4,7 @@ AFRAME.registerComponent('grass-system', {
     schema: {
       chunkSize: { type: 'number', default: 32 },           // Size of each grass chunk
       renderDistance: { type: 'number', default: 96 },      // Distance from player to render grass
-      instancesPerChunk: { type: 'number', default: 40000 },// Number of grass blades per chunk
+      instancesPerChunk: { type: 'number', default: 24000 },// Number of grass blades per chunk
       updateThreshold: { type: 'number', default: 16 },     // Distance threshold for chunk updates
       minHeight: { type: 'number', default: 0.8 },          // Minimum height of grass blades
       maxHeight: { type: 'number', default: 1.5 },          // Maximum height of grass blades
