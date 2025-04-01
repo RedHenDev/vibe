@@ -389,7 +389,7 @@ panel.setAttribute('material', {
   shader: 'flat' 
 });
 // Scale to create oval shape
-panel.setAttribute('scale', '0.8 0.3 1');
+panel.setAttribute('scale', '0.9 0.46 1');
 panel.setAttribute('position', '0 0 -0.01');
 
     hudEntity.appendChild(panel);
