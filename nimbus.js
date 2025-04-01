@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     schema: {
       enabled: { default: true },
       // Cloud distribution
-      totalClouds: { type: 'number', default: 28 }, // Total cloud instances
+      totalClouds: { type: 'number', default: 14 }, // Total cloud instances
       skyRadius: { type: 'number', default: 360 },
       cloudBaseHeight: { type: 'number', default: 128 },
       heightRange: { type: 'number', default: 128 },
@@ -55,15 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const puffGeometry = new THREE.SphereGeometry(1, 8, 6); // Reduced poly count
       
       // Create a material with custom shader for soft edges
-      const cloudMaterial = new THREE.MeshStandardMaterial({
+      const cloudMaterial = new THREE.MeshBasicMaterial({
         color: this.data.cloudColor,
-        transparent: true,
-        opacity: 0.7,
-        roughness: 0.8,
-        metalness: 0.1,
-        shadows: false,
-        flatShading: true
-      });
+        transparent: true,  // Enable transparency if you want soft edges
+        opacity: 0.9,       // Slightly transparent for softer look
+        side: THREE.DoubleSide,  // Visible from both sides
+        depthWrite: false    // Prevents z-fighting between overlapping clouds
+    });
       
       // Create instanced mesh for small clouds (more numerous, smaller)
       const smallCloudCount = Math.floor(this.data.totalClouds * 0.7);

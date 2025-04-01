@@ -65,7 +65,7 @@ window.COLLECTIBLE_TYPES = {
       
       // Set up player reference and collection radius
       this.playerEl = document.querySelector('#player');
-      this.collectionRadius = 5;
+      this.collectionRadius = 3;
       
       // Get reference to sync system for multiplayer
       const scene = document.querySelector('a-scene');

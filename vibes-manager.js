@@ -363,6 +363,7 @@ AFRAME.registerComponent('collectibles-hud', {
     const hudEntity = document.createElement('a-entity');
     hudEntity.setAttribute('position', '0 -0.4 -1');
     
+    /*
     // Background panel
     const panel = document.createElement('a-entity');
     panel.setAttribute('geometry', { 
@@ -377,6 +378,20 @@ AFRAME.registerComponent('collectibles-hud', {
       shader: 'flat' 
     });
     panel.setAttribute('position', '0 0 -0.01');
+*/
+const panel = document.createElement('a-circle');
+panel.setAttribute('radius', '0.25');
+panel.setAttribute('segments', '32');
+panel.setAttribute('material', { 
+  color: 'rgba(4, 132, 157, 0.7)', 
+  opacity: 0.7, 
+  transparent: true, 
+  shader: 'flat' 
+});
+// Scale to create oval shape
+panel.setAttribute('scale', '0.8 0.3 1');
+panel.setAttribute('position', '0 0 -0.01');
+
     hudEntity.appendChild(panel);
     
     // Text display
