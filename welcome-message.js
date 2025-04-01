@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileText: { type: 'string', default: '• swipe to turn • walk button to move • tap to shoot pulse' },
         desktopText: { type: 'string', default: '• SPACE for menu • L for leaderboard • CLICK to shoot pulse' },
         vrText: { type: 'string', default: 'tilt head left toggles walk • tilt head right shoots pulse • farther right toggles menu' },
-        goalText: { type: 'string', default: 'explore infinite world • collect vibes • beware the night!' }
+        goalText: { type: 'string', default: 'explore to find pyramids -- the secret lore awaits • collect vibes • beware the night!' }
       },
   
       init: function() {
