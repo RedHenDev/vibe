@@ -72,7 +72,8 @@ AFRAME.registerComponent('portal-system', {
     // Create exit portal entity
     const exitPortal = document.createElement('a-entity');
     exitPortal.setAttribute('id', 'exit-portal');
-    exitPortal.setAttribute('position', '-95 55 -19');
+    //exitPortal.setAttribute('position', '-95 55 -19');
+    exitPortal.setAttribute('position', '88 38 -323');
     
     // Create animated portal ring (torus)
     const portalRing = document.createElement('a-torus');
