@@ -1,5 +1,5 @@
-// Portal System for Eigengrau Light
-// Allows travel between games in the Vibeverse webring
+// Portal System for Eigengrau Light with Wavy Stars Portal Effect
+// Allows travel between games in the Vibeverse webring with a Quake-inspired portal design
 
 document.addEventListener('DOMContentLoaded', () => {
   const scene = document.querySelector('a-scene');
@@ -17,6 +17,35 @@ document.addEventListener('DOMContentLoaded', () => {
 // Main portal system component
 AFRAME.registerComponent('portal-system', {
   init: function() {
+    // Register custom shader for wavy starfield effect
+    AFRAME.registerShader('wave-distortion', {
+      schema: {
+        time: {type: 'time', is: 'uniform'},
+        map: {type: 'map', is: 'uniform'},
+        color: {type: 'color', is: 'uniform', default: 'white'}
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        uniform sampler2D map;
+        uniform vec3 color;
+        varying vec2 vUv;
+        void main() {
+          vec2 uv = vUv;
+          uv.x += sin(uv.y * 10.0 + time * 0.001) * 0.05;
+          uv.y += sin(uv.x * 10.0 + time * 0.001) * 0.05;
+          vec4 texColor = texture2D(map, uv);
+          gl_FragColor = texColor * vec4(color, 1.0);
+        }
+      `
+    });
+
     // Check if we should create a start portal (coming from another game)
     const urlParams = new URLSearchParams(window.location.search);
     const fromPortal = urlParams.get('portal') === 'true';
@@ -43,11 +72,9 @@ AFRAME.registerComponent('portal-system', {
     // Create exit portal entity
     const exitPortal = document.createElement('a-entity');
     exitPortal.setAttribute('id', 'exit-portal');
+    exitPortal.setAttribute('position', '-95 55 -19');
     
-    // Position the portal in the world.
-    exitPortal.setAttribute('position', '-95 95 -19');
-    
-    // Create visible portal ring (torus)
+    // Create animated portal ring (torus)
     const portalRing = document.createElement('a-torus');
     portalRing.setAttribute('color', '#00ff00');
     portalRing.setAttribute('radius', '15');
@@ -55,13 +82,35 @@ AFRAME.registerComponent('portal-system', {
     portalRing.setAttribute('segments-tubular', '32');
     portalRing.setAttribute('segments-radial', '16');
     portalRing.setAttribute('material', 'emissive: #00ff00; emissiveIntensity: 0.5; transparent: true; opacity: 0.8');
+    // Add rotation animation
+    // portalRing.setAttribute('animation', {
+    //   property: 'rotation',
+    //   to: '0 360 0',
+    //   loop: true,
+    //   dur: 10000,
+    //   easing: 'linear'
+    // });
+    // Add pulsing scale animation
+    portalRing.setAttribute('animation__scale', {
+      property: 'scale',
+      to: '1.1 1.1 1.1',
+      dir: 'alternate',
+      loop: true,
+      dur: 2000,
+      easing: 'easeInOutQuad'
+    });
     exitPortal.appendChild(portalRing);
     
-    // Create portal inner surface (disc)
+    // Create portal inner surface with wavy starfield effect
     const portalInner = document.createElement('a-circle');
-    portalInner.setAttribute('color', '#00ff00');
     portalInner.setAttribute('radius', '13');
-    portalInner.setAttribute('material', 'transparent: true; opacity: 0.5; side: double');
+    portalInner.setAttribute('material', {
+      shader: 'wave-distortion',
+      map: './assets/starfield.png', // Replace with actual starfield texture URL
+      color: '#00ff00',
+      transparent: true,
+      side: 'double'
+    });
     exitPortal.appendChild(portalInner);
     
     // Add portal label
@@ -74,6 +123,14 @@ AFRAME.registerComponent('portal-system', {
     portalLabel.setAttribute('side', 'double');
     exitPortal.appendChild(portalLabel);
     
+    // Add glowing point light
+    const portalLight = document.createElement('a-light');
+    portalLight.setAttribute('type', 'point');
+    portalLight.setAttribute('color', '#00ff00');
+    portalLight.setAttribute('intensity', '1');
+    portalLight.setAttribute('distance', '50');
+    exitPortal.appendChild(portalLight);
+    
     // Add to scene
     this.el.appendChild(exitPortal);
     
@@ -85,25 +142,45 @@ AFRAME.registerComponent('portal-system', {
     // Create start portal entity
     const startPortal = document.createElement('a-entity');
     startPortal.setAttribute('id', 'start-portal');
-    
-    // Position near player spawn
     startPortal.setAttribute('position', '10 12 22');
     
-    // Create visible portal ring (torus)
+    // Create animated portal ring (torus)
     const portalRing = document.createElement('a-torus');
-    portalRing.setAttribute('color', '#FFF');
+    portalRing.setAttribute('color', '#ff0000');
     portalRing.setAttribute('radius', '15');
     portalRing.setAttribute('radius-tubular', '2');
     portalRing.setAttribute('segments-tubular', '32');
     portalRing.setAttribute('segments-radial', '16');
     portalRing.setAttribute('material', 'emissive: #ff0000; emissiveIntensity: 0.5; transparent: true; opacity: 0.8');
+    // Add rotation animation
+    // portalRing.setAttribute('animation', {
+    //   property: 'rotation',
+    //   to: '0 360 0',
+    //   loop: true,
+    //   dur: 10000,
+    //   easing: 'linear'
+    // });
+    // Add pulsing scale animation
+    // portalRing.setAttribute('animation__scale', {
+    //   property: 'scale',
+    //   to: '1.1 1.1 1.1',
+    //   dir: 'alternate',
+    //   loop: true,
+    //   dur: 2000,
+    //   easing: 'easeInOutQuad'
+    // });
     startPortal.appendChild(portalRing);
     
-    // Create portal inner surface (disc)
+    // Create portal inner surface with wavy starfield effect
     const portalInner = document.createElement('a-circle');
-    portalInner.setAttribute('color', '#ff0000');
     portalInner.setAttribute('radius', '13');
-    portalInner.setAttribute('material', 'transparent: true; opacity: 0.5; side: double');
+    portalInner.setAttribute('material', {
+      shader: 'wave-distortion',
+      map: './assets/starfield.png', // Replace with actual starfield texture URL
+      color: '#ff0000',
+      transparent: true,
+      side: 'double'
+    });
     startPortal.appendChild(portalInner);
     
     // Add portal label - extract domain from refUrl for display
@@ -121,6 +198,14 @@ AFRAME.registerComponent('portal-system', {
     portalLabel.setAttribute('side', 'double');
     startPortal.appendChild(portalLabel);
     
+    // Add glowing point light
+    const portalLight = document.createElement('a-light');
+    portalLight.setAttribute('type', 'point');
+    portalLight.setAttribute('color', '#ff0000');
+    portalLight.setAttribute('intensity', '1');
+    portalLight.setAttribute('distance', '50');
+    startPortal.appendChild(portalLight);
+    
     // Store original URL for return journey
     startPortal.setAttribute('data-ref-url', refUrl);
     
@@ -135,16 +220,14 @@ AFRAME.registerComponent('portal-system', {
     // Store for collision detection
     this.startPortal = startPortal;
     
-    // Set player position near start portal (they're coming out of it)
+    // Set player position near start portal
     if (this.playerEl) {
-      // Position player 20 units in front of portal
       const portalPos = startPortal.getAttribute('position');
       this.playerEl.setAttribute('position', `${portalPos.x} ${portalPos.y} ${portalPos.z + 20}`);
     }
   },
   
   checkPortalCollisions: function() {
-    // Skip if no player
     if (!this.playerEl) return;
     
     const playerPos = this.playerEl.getAttribute('position');
@@ -153,8 +236,6 @@ AFRAME.registerComponent('portal-system', {
     if (this.exitPortal) {
       const exitPortalPos = this.exitPortal.getAttribute('position');
       const distanceToExit = this.calculateDistance(playerPos, exitPortalPos);
-      
-      // If player is close to exit portal
       if (distanceToExit < 15) {
         this.enterExitPortal();
       }
@@ -164,8 +245,6 @@ AFRAME.registerComponent('portal-system', {
     if (this.startPortal) {
       const startPortalPos = this.startPortal.getAttribute('position');
       const distanceToStart = this.calculateDistance(playerPos, startPortalPos);
-      
-      // If player is close to start portal
       if (distanceToStart < 15) {
         this.enterStartPortal();
       }
@@ -180,39 +259,25 @@ AFRAME.registerComponent('portal-system', {
   },
   
   enterExitPortal: function() {
-    // Prevent multiple executions
     if (this.transitioning) return;
     this.transitioning = true;
     
-    // Create URL for portal.pieter.com with necessary parameters
     const params = new URLSearchParams();
-    
-    // Add required parameters
     params.append('portal', 'true');
-    
-    // Add username (use player name from game.js if available)
     const playerName = window.playerName || 'Eigengrau';
     params.append('username', playerName);
-    
-    // Add color
     params.append('color', 'white');
     
-    // Add speed - get from terrain-movement component if available
     let speed = 5;
     if (this.playerEl.components['terrain-movement']) {
       const tmc = this.playerEl.components['terrain-movement'];
       speed = tmc.running ? 10 : 5;
     }
     params.append('speed', speed);
-    
-    // Add ref URL (current page)
     params.append('ref', window.location.href.split('?')[0]);
     
-    // Get player position and rotation for continuity
     const playerPos = this.playerEl.getAttribute('position');
     const cameraRotation = document.querySelector('#cam').getAttribute('rotation');
-    
-    // Add optional position and rotation
     params.append('speed_x', 0);
     params.append('speed_y', 0);
     params.append('speed_z', speed);
@@ -220,35 +285,24 @@ AFRAME.registerComponent('portal-system', {
     params.append('rotation_y', cameraRotation.y);
     params.append('rotation_z', cameraRotation.z);
     
-    // Construct final URL
     const portalUrl = `https://portal.pieter.com/?${params.toString()}`;
-    
-    // Redirect after slight delay for visual effect
     setTimeout(() => {
       window.location.href = portalUrl;
     }, 500);
   },
   
   enterStartPortal: function() {
-    // Prevent multiple executions
     if (this.transitioning) return;
     this.transitioning = true;
     
-    // Get return URL from portal data attribute
     let returnUrl = this.startPortal.getAttribute('data-ref-url');
-    
-    // Ensure URL has proper protocol
     if (!returnUrl.startsWith('http://') && !returnUrl.startsWith('https://')) {
       returnUrl = 'https://' + returnUrl;
     }
     
-    // Create URL parameters for return journey
     const params = new URLSearchParams();
-    
-    // Add portal=true to indicate coming from portal
     params.append('portal', 'true');
     
-    // Add all parameters from when we arrived
     const allAttributes = this.startPortal.getAttributeNames();
     for (const attr of allAttributes) {
       if (attr.startsWith('data-param-') && attr !== 'data-param-ref' && attr !== 'data-param-portal') {
@@ -258,14 +312,10 @@ AFRAME.registerComponent('portal-system', {
       }
     }
     
-    // Add our game as the ref
     params.append('ref', window.location.href.split('?')[0]);
     
-    // Get player position and rotation for continuity
     const playerPos = this.playerEl.getAttribute('position');
     const cameraRotation = document.querySelector('#cam').getAttribute('rotation');
-    
-    // Add optional position and rotation
     params.append('speed_x', 0);
     params.append('speed_y', 0);
     params.append('speed_z', 5);
@@ -273,17 +323,13 @@ AFRAME.registerComponent('portal-system', {
     params.append('rotation_y', cameraRotation.y);
     params.append('rotation_z', cameraRotation.z);
     
-    // Construct final URL
     const returnPortalUrl = `${returnUrl}${returnUrl.includes('?') ? '&' : '?'}${params.toString()}`;
-    
-    // Redirect after slight delay for visual effect
     setTimeout(() => {
       window.location.href = returnPortalUrl;
     }, 500);
   },
   
   remove: function() {
-    // Clean up
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
     }

@@ -5,7 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     AFRAME.registerComponent('welcome-message', {
       schema: {
-        title: { default: 'Eigengrau Light v1.0' },
+        title: { default: 'the Eigengrau Light' },
         duration: { type: 'number', default: 240000 }, // How long to show message (ms)
         mobileText: { type: 'string', default: '• swipe to turn • walk button to move • tap to shoot pulse' },
         desktopText: { type: 'string', default: '• SPACE for menu • L for leaderboard • CLICK to shoot pulse' },
