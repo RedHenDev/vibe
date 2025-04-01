@@ -263,7 +263,7 @@ document.querySelector('#micro-hud-text').setAttribute(
         if (this.flying){
             // Pitch can affect y position...for flight :D
             //position.y += pitch*0.06 * Math.abs(this.velocity.z+this.velocity.x);
-            position.y += pitch*0.8*this.moveZ;
+            position.y += pitch*0.08*this.moveZ;
         } else if (this.lunaBounce) {
             if (!this.jumping){
                 position.y -= this.presentJumpSpeed;

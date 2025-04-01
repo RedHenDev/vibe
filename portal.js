@@ -45,7 +45,7 @@ AFRAME.registerComponent('portal-system', {
     exitPortal.setAttribute('id', 'exit-portal');
     
     // Position the portal in the world.
-    exitPortal.setAttribute('position', '-95 55 -19');
+    exitPortal.setAttribute('position', '-95 95 -19');
     
     // Create visible portal ring (torus)
     const portalRing = document.createElement('a-torus');
@@ -87,7 +87,7 @@ AFRAME.registerComponent('portal-system', {
     startPortal.setAttribute('id', 'start-portal');
     
     // Position near player spawn
-    startPortal.setAttribute('position', '10 42 22');
+    startPortal.setAttribute('position', '10 12 22');
     
     // Create visible portal ring (torus)
     const portalRing = document.createElement('a-torus');

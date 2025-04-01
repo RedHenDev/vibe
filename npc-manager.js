@@ -75,6 +75,34 @@ AFRAME.registerSystem('npc-manager', {
     defineNPCTypes: function() {
       // Define different types of NPCs with nocturnal property
       this.npcTypes = {
+        'glass-tooth_b': {
+          model: '#mGlasst',
+          nocturnal: true,
+          scale: '0.4 0.4 0.4',
+          targetID: '#player',
+          height: 1,
+          speed: 5,
+          rSpeed: 1,
+          clampY: false,
+          adjustY: 3.14,
+          wiggle: false,
+          flee: false,
+          spawnChance: 1
+        },
+        'glass-tooth_1': {
+          model: '#mGlasst',
+          nocturnal: true,
+          scale: '1 1 1',
+          targetID: '#player',
+          height: 2,
+          speed: 4,
+          rSpeed: 0.9,
+          clampY: false,
+          adjustY: 3.14,
+          wiggle: false,
+          flee: false,
+          spawnChance: 1
+        },
         'glass-tooth_3': {
           model: '#mGlasst',
           nocturnal: true,
@@ -94,7 +122,7 @@ AFRAME.registerSystem('npc-manager', {
           nocturnal: true,
           scale: '32 32 32',
           height: 64,
-          speed: 1.2,
+          speed: 3,
           rSpeed: 1.2,
           clampY: false,
           wiggle: false,
@@ -106,7 +134,7 @@ AFRAME.registerSystem('npc-manager', {
           nocturnal: true,
           scale: '7 7 7',
           height: 6,
-          speed: 0.8,
+          speed: 3,
           rSpeed: 1.0,
           clampY: false,
           adjustY: 3.14,
