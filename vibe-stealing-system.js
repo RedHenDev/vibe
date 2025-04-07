@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
       vibeStealingEntity.setAttribute('id', 'vibe-stealing-system');
       vibeStealingEntity.setAttribute('vibe-stealing-system', '');
       scene.appendChild(vibeStealingEntity);
-      console.log('Vibe stealing system initialized');
+      // console.log('Vibe stealing system initialized');
     });
   }
 });
@@ -57,7 +57,7 @@ AFRAME.registerComponent('vibe-stealing-system', {
     // Get reference to collectibles manager for managing vibes
     this.collectiblesManager = window.collectiblesManager;
     
-    console.log('Vibe stealing system ready');
+    // console.log('Vibe stealing system ready');
   },
   
   createTheftIndicator: function() {
@@ -218,7 +218,7 @@ AFRAME.registerComponent('vibe-stealing-system', {
         this.dayNightCycle = dayNightCycle.components['day-night-cycle'];
         this.isNightTime = this.dayNightCycle.isNight;
         clearInterval(checkInterval);
-        console.log('Vibe stealing system connected to day-night cycle');
+        // console.log('Vibe stealing system connected to day-night cycle');
       }
     }, 1000);
   },
@@ -349,7 +349,7 @@ AFRAME.registerComponent('vibe-stealing-system', {
       
       // Update stats directly on the system
       managerSystem.stats.points -= stoleAmount;
-      console.log(`Stole ${stoleAmount} vibes, remaining: ${managerSystem.stats.points}`);
+      // console.log(`Stole ${stoleAmount} vibes, remaining: ${managerSystem.stats.points}`);
       
       // Trigger a stats update event
       document.dispatchEvent(new CustomEvent('score-updated', {
@@ -368,7 +368,7 @@ AFRAME.registerComponent('vibe-stealing-system', {
       
       // Update stats
       window.collectiblesManager.stats.points -= stoleAmount;
-      console.log(`Stole ${stoleAmount} vibes, remaining: ${window.collectiblesManager.stats.points}`);
+      // console.log(`Stole ${stoleAmount} vibes, remaining: ${window.collectiblesManager.stats.points}`);
       
       // If this has a recordCollection method, try to use it to update internal state
       if (typeof window.collectiblesManager.recordCollection === 'function') {
@@ -599,7 +599,7 @@ AFRAME.registerComponent('vibe-hunter', {
     }
     
     // Log for debugging
-    console.log(`NPC ${this.el.id} hunting with speed ${this.aiComponent.data.speed}`);
+    // console.log(`NPC ${this.el.id} hunting with speed ${this.aiComponent.data.speed}`);
   },
   
   stopHunting: function() {
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Call original function
         if (originalNight) originalNight.call(this);
         
-        console.log("Enhanced night mode for NPCs activated");
+        // console.log("Enhanced night mode for NPCs activated");
         
         // Enhance nocturnal NPCs when night falls
         const npcSystem = document.querySelector('a-scene').systems['npc-manager'];
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
       
-      console.log("Enhanced night mode for NPCs set up");
+      // console.log("Enhanced night mode for NPCs set up");
     } else {
       // Try again in a moment
       setTimeout(waitForDayNightCycle, 1000);

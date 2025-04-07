@@ -120,7 +120,7 @@ AFRAME.registerComponent('simple-artefacts', {
     
     // Create a simple pyramid base
     const pyramid = document.createElement('a-entity');
-    pyramid.setAttribute('geometry', 'primitive: cone; radiusBottom: 2; radiusTop: 0; height: 3; segmentsRadial: 4');
+    pyramid.setAttribute('geometry', 'primitive: cone; radius: 2; radiusTop: 0; height: 3; segmentsRadial: 4');
     pyramid.setAttribute('material', `color: ${this.data.baseColor}; emissive: ${this.data.glowColor}; emissiveIntensity: 0.5`);
     
     // Create floating sphere with portal shader
