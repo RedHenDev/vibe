@@ -1,9 +1,11 @@
 // Game configuration.
 const config = {
-    websocketUrl: 'wss://weeble-server.glitch.me/',
+    websocketUrl: 'wss://vibe-production-72c7.up.railway.app/',
     playerColors: ['white', 'black'],
     playerModels: ['#mWibbit', '#mShelby'] // Available models for player avatars
 };
+
+// websocketUrl: 'wss://weeble-server.glitch.me/',
 
 // Create a billboard component that makes entities always face the camera
 AFRAME.registerComponent('billboard', {
